@@ -1,0 +1,1622 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Bureau de la Garde de Vendeaume</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin:0;
+    font-family: Georgia, serif;
+    color:#2a1a12;
+    background:
+        linear-gradient(90deg, rgba(82,48,24,0.10) 1px, transparent 1px),
+        linear-gradient(#efe0be, #c9ad79);
+    background-size: 44px 44px, auto;
+}
+
+body::before {
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:0.10;
+    background-image:url("https://www.transparenttextures.com/patterns/parchment.png");
+}
+
+.container {
+    max-width:1180px;
+    margin:40px auto;
+    padding:26px;
+    background:rgba(255,248,232,0.86);
+    border:1px solid rgba(70,40,20,0.45);
+    box-shadow:0 18px 50px rgba(54,31,14,0.18);
+}
+
+h2 {
+    margin:0 0 20px;
+    text-align:center;
+    font-size:28px;
+    letter-spacing:0;
+}
+
+.workspace {
+    display:grid;
+    grid-template-columns:minmax(0, 1.05fr) minmax(340px, 0.95fr);
+    gap:22px;
+    align-items:start;
+}
+
+.form-pane,
+.preview-pane {
+    min-width:0;
+}
+
+.preview-pane {
+    position:sticky;
+    top:18px;
+}
+
+label {
+    display:block;
+    font-weight:bold;
+    margin-top:4px;
+}
+
+.section,
+.panel {
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px solid rgba(70,40,20,0.25);
+}
+
+.panel {
+    padding:0;
+    border:1px solid rgba(70,40,20,0.28);
+    background:rgba(255,255,255,0.22);
+}
+
+.panel > summary {
+    padding:11px 12px;
+    cursor:pointer;
+    font-weight:bold;
+    background:rgba(90,59,30,0.13);
+}
+
+.panel-body {
+    padding:12px;
+}
+
+.mode-bar,
+.button-row,
+.tool-grid {
+    display:grid;
+    gap:10px;
+}
+
+.mode-bar,
+.button-row {
+    grid-template-columns:1fr 1fr;
+}
+
+.mode-bar {
+    margin-bottom:20px;
+}
+
+.mode-btn {
+    background:#5a3b1e;
+}
+
+.mode-btn.active {
+    background:#2f1f12;
+}
+
+input, textarea, select {
+    width:100%;
+    padding:10px;
+    margin:6px 0 12px;
+    font-family:Georgia, serif;
+    border:1px solid rgba(60,40,20,0.5);
+    background:rgba(255,255,255,0.5);
+}
+
+textarea {
+    min-height:80px;
+    resize:vertical;
+}
+
+button {
+    width:100%;
+    padding:10px;
+    background:#5a3b1e;
+    color:#f5e6c8;
+    border:none;
+    font-weight:bold;
+    cursor:pointer;
+    margin-top:8px;
+    transition:background 140ms ease, transform 140ms ease;
+}
+
+button:hover,
+button:focus {
+    background:#3b2414;
+}
+
+button:active {
+    transform:translateY(1px);
+}
+
+.quiet-btn {
+    background:#7a664a;
+}
+
+.law-list {
+    display:grid;
+    gap:8px;
+    margin:8px 0 12px;
+    max-height:260px;
+    overflow:auto;
+    padding-right:6px;
+}
+
+.law-item {
+    background:rgba(255,255,255,0.35);
+    border:1px solid rgba(70,40,20,0.35);
+    padding:10px;
+}
+
+.law-panel {
+    margin:6px 0 12px;
+}
+
+.law-panel > summary {
+    padding:10px;
+    background:#5a3b1e;
+    color:#f5e6c8;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.law-results {
+    display:grid;
+    gap:8px;
+    margin:8px 0 12px;
+}
+
+.law-result {
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:8px;
+    padding:10px;
+    background:rgba(255,255,255,0.42);
+    border:1px solid rgba(70,40,20,0.28);
+}
+
+.law-result input {
+    width:auto;
+    margin:3px 0 0;
+}
+
+.law-result-title {
+    display:block;
+    font-weight:bold;
+}
+
+.law-result-meta {
+    display:block;
+    margin-top:2px;
+    color:#5e4328;
+    font-size:13px;
+}
+
+.law-result-text {
+    display:block;
+    margin-top:4px;
+    color:#3f2a18;
+    font-size:13px;
+}
+
+.law-title {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:0;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.law-title input {
+    width:auto;
+    margin:0;
+}
+
+.law-text {
+    margin:8px 0 0 24px;
+    color:#3f2a18;
+}
+
+.selected-laws {
+    margin:8px 0 12px;
+    padding:10px;
+    background:rgba(255,255,255,0.35);
+    border:1px solid rgba(70,40,20,0.25);
+    color:#3f2a18;
+    font-size:14px;
+}
+
+.selected-laws strong {
+    display:block;
+    margin-bottom:6px;
+}
+
+.selected-laws ul {
+    margin:0;
+    padding-left:18px;
+}
+
+.sentence-grid {
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:10px;
+    margin:6px 0 12px;
+}
+
+.sentence-card {
+    padding:10px;
+    background:rgba(255,255,255,0.35);
+    border:1px solid rgba(70,40,20,0.28);
+}
+
+.sentence-card label {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:0 0 8px;
+}
+
+.sentence-card input[type="checkbox"] {
+    width:auto;
+    margin:0;
+}
+
+.sentence-card input[type="number"] {
+    margin-bottom:0;
+}
+
+#copyStatus {
+    min-height:20px;
+    margin-top:8px;
+    text-align:right;
+    font-style:italic;
+    color:#4f351e;
+}
+
+.indiv-card {
+    position:relative;
+    padding:12px;
+    margin-bottom:12px;
+    background:rgba(255,255,255,0.35);
+    border:1px solid rgba(70,40,20,0.4);
+}
+
+.indiv-row {
+    display:grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap:8px;
+    padding-right:28px;
+}
+
+.indiv-remove {
+    position:absolute;
+    top:8px;
+    right:8px;
+    width:22px;
+    height:22px;
+    padding:0;
+    border:none;
+    background:#3b2414;
+    color:white;
+    cursor:pointer;
+    font-size:14px;
+    line-height:22px;
+}
+
+pre {
+    margin:0;
+    padding:15px;
+    background:rgba(255,255,255,0.5);
+    white-space:pre-wrap;
+    border:1px solid rgba(60,40,20,0.4);
+}
+
+.preview-card {
+    padding:16px;
+    background:#2f3136;
+    color:#dcddde;
+    border:1px solid rgba(0,0,0,0.35);
+    font-family:Georgia, serif;
+    min-height:220px;
+    white-space:normal;
+}
+
+.preview-card h2,
+.preview-card h3 {
+    margin:14px 0 10px;
+    color:#fff;
+    text-align:left;
+}
+
+.preview-card h2 {
+    font-size:20px;
+}
+
+.preview-card h3 {
+    font-size:16px;
+}
+
+.preview-line {
+    margin:4px 0;
+}
+
+.preview-quote {
+    margin:4px 0;
+    padding:4px 0 4px 10px;
+    border-left:4px solid #4f545c;
+    color:#d4d7dc;
+}
+
+.preview-small {
+    margin:2px 0;
+    color:#aeb2b8;
+    font-size:12px;
+    font-style:italic;
+}
+
+.output-title {
+    margin:18px 0 8px;
+    font-weight:bold;
+}
+
+.app-credit {
+    margin-top:14px;
+    text-align:right;
+    color:rgba(63,42,24,0.48);
+    font-size:12px;
+    font-style:italic;
+}
+
+@media (max-width: 700px) {
+    .container {
+        margin:16px;
+        padding:18px;
+    }
+
+    .indiv-row,
+    .mode-bar,
+    .button-row,
+    .sentence-grid {
+        grid-template-columns:1fr;
+    }
+
+    .workspace {
+        grid-template-columns:1fr;
+    }
+
+    .preview-pane {
+        position:static;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>📜 BUREAU DE LA GARDE - VENDEAUME 📜</h2>
+
+<div class="workspace">
+<div class="form-pane">
+
+<div class="mode-bar">
+<button class="mode-btn active" id="m1" onclick="setMode('rapport')">RAPPORT</button>
+<button class="mode-btn" id="m2" onclick="setMode('arrestation')">ARRESTATION</button>
+</div>
+
+<label>Nom du garde</label>
+<input id="nom" placeholder="Ex : Hrolf Marteau-de-Fer" oninput="saveGuardName(); handleFormChange()">
+
+<label>Lieu</label>
+<input id="lieu" placeholder="Ex : Quartier gris, Vendeaume">
+
+<label>Date et heure des faits</label>
+<input type="datetime-local" id="datetime">
+
+<details class="panel" open>
+<summary>Individus concernés</summary>
+<div class="panel-body">
+<div id="indivContainer"></div>
+<button type="button" onclick="addIndiv()">Ajouter un individu</button>
+</div>
+</details>
+
+<details id="rapportBox" class="panel" open>
+<summary>Rapport</summary>
+<div class="panel-body">
+<label>Rapport</label>
+<textarea id="rapport"></textarea>
+</div>
+</details>
+
+<details id="arrestationBox" class="panel" open style="display:none;">
+<summary>Arrestation</summary>
+<div class="panel-body">
+
+<label>Articles retenus</label>
+<input id="lawSearch" placeholder="Rechercher un article, un mot-clé, une peine..." oninput="renderLaws()">
+<div class="law-results" id="lawSearchResults"></div>
+<details class="law-panel">
+<summary>Lois locales - Estemarche / Vendeaume</summary>
+<div class="law-list" id="localLawList"></div>
+</details>
+<details class="law-panel">
+<summary>Lois impériales / Bordeciel</summary>
+<div class="law-list" id="imperialLawList"></div>
+</details>
+<details class="law-panel">
+<summary>Arrêtés locaux supplémentaires</summary>
+<div class="law-list" id="extraLocalLawList"></div>
+</details>
+<div class="selected-laws" id="selectedLawsSummary"></div>
+
+<label>Article ou motif personnalisé</label>
+<textarea id="customLaw" placeholder="Ex : Article local non listé, refus d'obtempérer, outrage à la garde..."></textarea>
+
+<label>Description des faits</label>
+<textarea id="faits"></textarea>
+
+<label>Décision / Peine</label>
+<div class="sentence-grid">
+<div class="sentence-card">
+<label>Geôle</label>
+<input type="number" id="jailHours" min="0" step="1" placeholder="Minutes">
+</div>
+<div class="sentence-card">
+<label>Amende</label>
+<input type="number" id="fineAmount" min="0" step="1" placeholder="Septims">
+</div>
+<div class="sentence-card">
+<label>Travaux forcés</label>
+<input type="number" id="laborHours" min="0" step="1" placeholder="Minutes">
+</div>
+</div>
+<textarea id="decision"></textarea>
+
+</div>
+</details>
+
+<div class="button-row">
+<button onclick="generate()">Générer</button>
+<button onclick="copyReport()">Copier</button>
+</div>
+<button class="quiet-btn" type="button" onclick="resetForm()">Nouveau rapport</button>
+<div id="copyStatus"></div>
+</div>
+
+<div class="preview-pane">
+<details class="panel" open>
+<summary>Aperçu Discord</summary>
+<div class="panel-body">
+<div class="preview-card" id="discordPreview"></div>
+</div>
+</details>
+
+<div class="output-title">Texte copiable</div>
+<pre id="output"></pre>
+</div>
+</div>
+
+<div class="app-credit">By Povik</div>
+
+</div>
+
+<script>
+
+let mode = "rapport";
+const formStorageKey = "rpskyrim-current-form";
+const guardNameStorageKey = "rpskyrim-guard-name";
+let canSaveForm = false;
+
+function setMode(m){
+mode = m;
+
+document.getElementById("m1").classList.toggle("active", m==="rapport");
+document.getElementById("m2").classList.toggle("active", m==="arrestation");
+
+document.getElementById("rapportBox").style.display =
+(m==="rapport") ? "block" : "none";
+
+document.getElementById("arrestationBox").style.display =
+(m==="arrestation") ? "block" : "none";
+
+handleFormChange();
+}
+
+function addIndiv(data = {}){
+const c = document.getElementById("indivContainer");
+const d = document.createElement("div");
+d.className = "indiv-card";
+
+d.innerHTML = `
+<button class="indiv-remove" type="button" onclick="removeIndiv(this)">×</button>
+
+<div class="indiv-row">
+<input class="name" placeholder="Nom de l'individu">
+
+<select class="race">
+<option>Race</option>
+<option>Nordique</option>
+<option>Impérial</option>
+<option>Bréton</option>
+<option>Rougegarde</option>
+<option>Dunmer</option>
+<option>Altmer</option>
+<option>Bosmer</option>
+<option>Orque</option>
+<option>Khajiit</option>
+<option>Argonien</option>
+</select>
+
+<select class="sex">
+<option>Sexe</option>
+<option>Homme</option>
+<option>Femme</option>
+<option>Non défini</option>
+</select>
+</div>
+
+<textarea class="phys" placeholder="Description physique (optionnel)"></textarea>
+`;
+
+c.appendChild(d);
+
+d.querySelector(".name").value = data.name || "";
+d.querySelector(".race").value = data.race || "Race";
+d.querySelector(".sex").value = data.sex || "Sexe";
+d.querySelector(".phys").value = data.phys || "";
+
+d.querySelectorAll("input, select, textarea").forEach(field => {
+    field.addEventListener("input", handleFormChange);
+    field.addEventListener("change", handleFormChange);
+});
+
+handleFormChange();
+}
+
+addIndiv();
+
+function removeIndiv(button){
+button.closest(".indiv-card").remove();
+handleFormChange();
+}
+
+function getIndivs(){
+return [...document.querySelectorAll(".indiv-card")].map(c => ({
+name: c.querySelector(".name").value.trim(),
+race: c.querySelector(".race").value,
+sex: c.querySelector(".sex").value,
+phys: c.querySelector(".phys").value.trim()
+})).filter(i => i.name || i.race !== "Race" || i.sex !== "Sexe" || i.phys);
+}
+
+const months=["Primétoile","Clairciel","Semailles","Ondepluie","Plantaisons","Mi-l'An","Hautzénith","Vifazur","Âtrefeu","Soufflegivre","Sombreciel","Soirétoile"];
+const days=["Sundas","Morndas","Tirdas","Middas","Turdas","Fredas","Loredas"];
+const localLaws = [
+    { article:"Article IV", title:"Port d'arme devant le trône", text:"Nul ne peut porter arme devant le trône sans autorisation." },
+    { article:"Article VII", title:"Dette non honorée", text:"Toute dette reconnue devant témoins doit être honorée." },
+    { article:"Article VIII", title:"Esclavage", text:"L’esclavage est interdit au sein de la Châtellerie d'Estemarche." },
+    { article:"Article IX", title:"Meurtre d'un homme libre", text:"Le meurtre d’un homme libre appelle compensation, duel ou bannissement." },
+    { article:"Article XVII", title:"Désertion en bataille", text:"La désertion en bataille est punie d’exil ou de mort." },
+    { article:"Article XVIII", title:"Pillage des terres alliées", text:"Le pillage des terres alliées est interdit." },
+    { article:"Article XIX", title:"Arme maudite, daedrique ou nécromantique", text:"Les armes maudites, daedriques ou nécromantiques doivent être déclarées." },
+    { article:"Article XXII", title:"Mensonge sous serment", text:"Mentir sous serment devant les dieux constitue sacrilège." },
+    { article:"Article XXIII", title:"Vol répété", text:"Le voleur pris trois fois perd droit de cité." },
+    { article:"Article XXV", title:"Corruption magique", text:"La corruption magique est crime majeur contre la châtellerie." },
+    { article:"Article XXVII", title:"Profanation", text:"Profaner tombes, tertres ou pierres runiques est interdit." },
+    { article:"Article XXIX", title:"Nécromancie", text:"La nécromancie est prohibée dans les terres du Jarl." },
+    { article:"Article XXXI", title:"Commerce étranger non recensé", text:"Les marchands étrangers ne sont pas autorisés à commercer sans recensement auprès de la Châtellerie." },
+    { article:"Article XXXII", title:"Commerce étranger hors zone autorisée", text:"Les caravanes khajiites et marchands étrangers peuvent commercer sous surveillance des gardes à l'extérieur des murs de Vendeaume, par delà le pont." },
+    { article:"Article XXXIII", title:"Fraude commerciale", text:"Toute fraude sur poids et mesures vaut confiscation des biens." },
+    { article:"Article XXXIV", title:"Taverne ouverte après l'appel de cloche", text:"Les tavernes ferment au troisième appel de cloche." },
+    { article:"Article XXXV", title:"Bagarre dans les rues", text:"Les bagarres dans les rues entraînent amende ou cachot." },
+    { article:"Article XXXVII", title:"Trahison draconique", text:"Aider volontairement un dragon ou un culte draconique est trahison." },
+    { article:"Article XXXVIII", title:"Provocation de géants", text:"Les géants de la Châtellerie ne doivent pas être provoqués sans raison." },
+    { article:"Article XXXIX", title:"Chasse au mammouth", text:"La chasse au mammouth sans autorisation du Jarl est interdite." }
+];
+const imperialLaws = [
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 2",
+        "title":  "Usurpation d\u0027identité [délit]",
+        "text":  "Constitue le fait d\u0027usurper l\u0027identité d\u0027un tiers. Peine en fonction de la gravité de l\u0027usurpation."
+    },
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 3",
+        "title":  "Menaces [délit mineur]",
+        "text":  "Les menaces de crime ou délit envers une personne, réitérées, écrites ou verbales, intimidations ou à conditions de remplir une condition sont punies par cet article. 250 septims et 1h de travaux forcés. Menaces aggravées [délit] Les menaces de crime ou délit envers une personne, réitérées, écrites ou verbales, intimidations ou à conditions de remplir une condition, aggravées par une ou plusieurs circonstances sont punies. 500 septims, radiation du poste s’il exerce une fonction dans une administration publique et 3h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 3-1",
+        "title":  "Circonstances aggravantes :",
+        "text":  "1° Menaces sur conjoint.e, membre de la famille ou personne vulnérable ; 2° Menaces en raison de la race ou du choix de l’un des 8 Divins ; 3° Menaces sur personne dépositaire de l’autorité publique, représentant de l’État ou de la loi ; 4° Menaces par une personne dépositaire de l’autorité publique, représentant de l’État ou de la loi ; 5° Menaces sur un prêtre d’un des (ou des) 8 Divins ; 6° Menaces à main armée (magie comprise)."
+    },
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 4",
+        "title":  "Rébellion [délit]",
+        "text":  "Constitue une rébellion le fait d’opposer une résistance violente ou non à une personne dépositaire de l’autorité publique ou chargée d’une mission de service public agissant, dans l’exercice de ses fonctions, pour l’exécution des lois, des ordres de l’autorité publique, des décisions ou mandats de justice lorsque celles-ci s’appliquent à la personne même. 100 septims et 1h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 5",
+        "title":  "Chantage [délit]",
+        "text":  "Le chantage est le fait d’obtenir, en menaçant de révéler ou d’imputer des faits de nature à porter atteinte à l’honneur ou à la considération, soit une signature, un engagement ou une renonciation, soit la révélation d’un secret, soit la remise de fonds, de valeurs ou d’un bien quelconque. 250 septims et 1h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 6",
+        "title":  "Diffamation [délit]",
+        "text":  "La diffamation est une allégation ou l’imputation d’un fait qui porte atteinte à l’honneur et à la considération d’une personne. Réparation à la hauteur du dommage causé, 1h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 7",
+        "title":  "Harcèlement [délit]",
+        "text":  "Le fait d’harceler une personne par des propos ou comportements répétés ayant pour objet ou pour effet une dégradation de ses conditions de vie se traduisant par une altération de sa santé physique ou mentale. Réparation à hauteur du dommage subi et 1h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 8",
+        "title":  "Mise en danger de la vie d’autrui [délit]",
+        "text":  "Le fait d’exposer directement autrui à un risque immédiat de mort ou de blessures de nature à entraîner une mutilation ou une infirmité permanente par la violation manifestement délibérée d’une obligation particulière de prudence ou de sécurité imposée par la loi ou le règlement. 500 septims et 1h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 9",
+        "title":  "Violences ou agression simples [crimina]",
+        "text":  "Sont considérées comme violence ou agression, les violences et agressions physiques ou psychologiques. Réparation à hauteur du préjudice subi, 550 septims d’amende et 3h de travaux forcés. Violences ou agression aggravées [crimina] Sont considérées comme violences ou agression aggravées, les violences ou aggression physiques ou psychologiques. Cela inclut les sorts d’illusion. Punition et réparation à hauteur des préjudices subis. 2h de travaux forcés et 1h d’emprisonnement."
+    },
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 9-1",
+        "title":  "Circonstances aggravantes :",
+        "text":  "1° Violences ou aggression sur conjoint.e, membre de la famille ou personne vulnérable ; 2° Violences ou aggression en raison de la race ou du choix de l’un des 8 Divins ; 3° Violences ou aggression sur personne dépositaire de l’autorité publique, représentant de l’État ou de la loi ; 4° Menaces sur une personne du corps médical ; 5° Violences ou aggression à main armée ; 6° Par l’utilisation de magie quelle qu’elle soit."
+    },
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 10",
+        "title":  "Prise d’otage, enlèvement et séquestration \u003e 4 personnes inclus [crimina]",
+        "text":  "Est considéré comme enlèvement et séquestration, le fait, sans ordre des autorités constituées et hors les cas prévus par la loi, d’arrêter, d’enlever, de détenir ou de séquestrer au delà de 3 personnes. 650 septims, 3h de travaux forcés et 1h d’emprisonnement."
+    },
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 10-1",
+        "title":  "Prise d’otage, enlèvement et séquestration \u003c 3 personnes inclus [crimina]",
+        "text":  "Est considéré comme enlèvement et séquestration, le fait, sans ordre des autorités constituées et hors les cas prévus par la loi, d’arrêter, d’enlever, de détenir ou de séquestrer moins de 4 personnes. 800 septims, 3h de travaux forcés et 1h d’emprisonnement."
+    },
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 11",
+        "title":  "Homicide involontaire [délit]",
+        "text":  "Est considéré comme homicide involontaire, le fait de causer, par maladresse, imprudence, inattention, négligence ou manquement à une obligation de prudence ou de sécurité imposée par la loi ou le règlement, la mort d’autrui. 800 septims, réparation à la famille et 5h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 12",
+        "title":  "Homicide volontaire [crimina]",
+        "text":  "Est considéré comme homicide volontaire, le fait de causer, par volonté directe, ou manquement volontaire à une obligation de prudence ou de sécurité imposée par la loi ou le règlement, la mort d’autrui. 1000 septims, réparation à la famille, 3h de travaux forcés et 2h d’emprisonnement. Homicide volontaire aggravé [crimina] Est considéré comme homicide volontaire aggravé, le fait de causer, par volonté directe, ou manquement volontaire à une obligation de prudence ou de sécurité imposée par la loi ou le règlement, la mort d’autrui. 1200 septims, 5h de travaux forcés et 3h d’emprisonnement."
+    },
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 12-1",
+        "title":  "Circonstances aggravantes :",
+        "text":  "1° Sur un membre de la famille, personne vulnérable ; 2° Sur représentant de l’État ou de la loi ; 3° Par un représentant de l’État ou de la loi en dehors de ses prérogatives de service ; 4° En raison de la race ou de la foi en l’un des 8 Divins ; 5° En bande organisée ; 6° En réunion ; 7° Pour intimider ou empêcher une victime un témoin ou partie civile de participer à un acte de justice ; 8° Avec préméditation."
+    },
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 13",
+        "title":  "Acte de torture, mutilations ou barbarie [crimina]",
+        "text":  "Est considéré comme acte de torture, mutilation ou barbarie, le fait de soumettre une personne à des tortures ou à des actes de barbarie physique. Réparation à hauteur du dommage subi, 800 septims, 5h de travaux forcés et 1h d’emprisonnement."
+    },
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 14",
+        "title":  "Actes de torture, mutilation ou barbarie aggravés [crimina]",
+        "text":  "Est considéré comme acte de torture, mutilation ou barbarie, le fait de soumettre une personne à des tortures ou à des actes de barbarie physique. Réparation à hauteur du dommage subi, 1000 septims, 5h de travaux forcés et 3h d’emprisonnement. Circonstances aggravantes : 1° Sur un membre de la famille, personne vulnérable ; 2° Sur représentant de l’État ou de la loi ; 3° Par un représentant de l’État ou de la loi ; 4° En raison de la race ou de la foi en l’un des 8 Divins ; 5° En bande organisée ; 6° En réunion ; 7° Pour intimider ou empêcher une victime un témoin ou partie civile de participer à un acte de justice ; 8° Pour obtenir une contrepartie."
+    },
+    {
+        "source":  "imperial",
+        "category":  "II - Atteintes aux personnes",
+        "article":  "Art. 15",
+        "title":  "Viol \u0026 Pédophilie [crimina]",
+        "text":  "Est considéré comme viol tout acte sexuel, de quelque nature qu’il soit, commis sur la personne d’autrui par violence, contrainte, menace ou surprise. Est considéré comme pédophilie tout acte sexuel effectué sur une personne n’ayant pas encore atteint le stade physique d’adulte. Peine de mort et saisie des biens."
+    },
+    {
+        "source":  "imperial",
+        "category":  "III - Atteintes aux biens",
+        "article":  "Art. 16",
+        "title":  "Destruction ou dégradation de bien public [délit mineur]",
+        "text":  "Est considéré comme destruction, dégradation ou détérioration de bien public, le fait de porter atteinte à un bien public de quelque manière que ce soit. 100 septims, 1h de travaux forcés et réparation du dommage subi."
+    },
+    {
+        "source":  "imperial",
+        "category":  "III - Atteintes aux biens",
+        "article":  "Art. 17",
+        "title":  "Destruction ou dégradation de bien privé [délit mineur]",
+        "text":  "Est considéré comme destruction, dégradation ou détérioration de bien privé, le fait de porter atteinte à un bien d’autrui de quelque manière que ce soit. 100 septims, réparation du dommage et 1h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "III - Atteintes aux biens",
+        "article":  "Art. 18",
+        "title":  "Intrusion dans une propriété privée [délit]",
+        "text":  "Est considéré comme intrusion dans la propriété privée, le fait de s’introduire chez autrui sans y être invité à l’aide de manœuvres, menaces, voies de fait ou contrainte, hors les cas où la loi le permet. 50 septims et 30mn d’emprisonnement. Intrusion dans une propriété privée aggravée [délit] Est considéré comme intrusion dans la propriété privée aggravée, le fait de s’introduire chez autrui sans y être invité à l’aide de manœuvres, menaces, voies de fait ou contrainte, hors les cas où la loi le permet. 70 septims et 1h d’emprisonnement."
+    },
+    {
+        "source":  "imperial",
+        "category":  "III - Atteintes aux biens",
+        "article":  "Art. 18-1",
+        "title":  "Circonstances aggravantes :",
+        "text":  "1° En connaissance de l’unique présence d’une personne vulnérable ; 2° En connaissance de l’appartenance de la propriété par une personne dépositaire de l’autorité publique, représentant de l’État ou de la loi ; 3° En raison de la race ou de la foi d’un l’un des 8 divins ; 4° Par une personne dépositaire de l’autorité publique, représentant de l’État ou de la loi ; 5° À main armée."
+    },
+    {
+        "source":  "imperial",
+        "category":  "III - Atteintes aux biens",
+        "article":  "Art. 19",
+        "title":  "Vol simple [délit mineur]",
+        "text":  "Est considéré comme vol simple l’acquisition illégale du bien d’autrui. Réparation, 50 septims, réparation et 1h de travaux forcés. Vol aggravé [délit] Est considéré comme vol aggravé l’acquisition illégale du bien d’autrui sous les conditions suivantes. Réparation, 70 septims et 2h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "III - Atteintes aux biens",
+        "article":  "Art. 19-1",
+        "title":  "Circonstances aggravantes :",
+        "text":  "1° Vol sur personne vulnérable ; 2° Vol sur raison de la race ou de la foi en l’un des 8 divins ; 3° Vol sur personne dépositaire de l’autorité publique, représentant de l’État ou de la loi en service ; 4° Vol par une personne dépositaire de l’autorité publique, représentant de l’État ou de la loi ; 5° Vol à main armée ; 6° Vol avec préméditation. 7° Vol en bande organisée."
+    },
+    {
+        "source":  "imperial",
+        "category":  "III - Atteintes aux biens",
+        "article":  "Art. 20",
+        "title":  "Recel [délit]",
+        "text":  "Est considéré comme recel, le fait de dissimuler, de conserver, de transmettre ou d’agir comme intermédiaire pour transmettre quelque chose tout en sachant que cela provient d’un crimina ou d’un délit. 100 pièces d’or par bien et 2h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "III - Atteintes aux biens",
+        "article":  "Art. 20-1",
+        "title":  "Recel en bande organisée [crimina]",
+        "text":  "Est considéré comme recel en bande organisée, le fait de dissimuler, de conserver, de transmettre ou d’agir comme intermédiaire pour transmettre quelque chose tout en sachant que cela provient d’un crimina ou d’un délit avec tout groupement formé, ou toute entente établie en vue de la préparation, caractérisée par un ou plusieurs faits matériels, le recel. 150 pièces d’or par bien et 2h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "IV - Atteintes portées aux services impériaux",
+        "article":  "Art. 21",
+        "title":  "Recours abusifs [Délit mineur]",
+        "text":  "Est considéré comme recours abusif de la part de l’auteur, une intention malicieuse, une mauvaise foi, ou l’existence d’une erreur grossière équipollente au dol. 200 septims."
+    },
+    {
+        "source":  "imperial",
+        "category":  "IV - Atteintes portées aux services impériaux",
+        "article":  "Art. 22",
+        "title":  "Violation de la propriété de l’Empire [Délit mineur]",
+        "text":  "Est considéré comme violation de la propriété de l’Etat le fait de pénétrer sans autorisation officielle dans un bâtiment impérial ou public, sans considérer les zones accessibles à la population. 100 septims."
+    },
+    {
+        "source":  "imperial",
+        "category":  "IV - Atteintes portées aux services impériaux",
+        "article":  "Art. 23",
+        "title":  "Corruption passive [crimina]",
+        "text":  "Est considéré comme corruption passive, le fait pour un fonctionnaire impérial de demander ou d’accepter un avantage quelconque, pour lui ou pour autrui, en échange de l’exécution ou de l’inexécution d’un acte de son mandat ou facilité par son mandat. Bannissement des offices publics, 1000 septims et 3h d’emprisonnement."
+    },
+    {
+        "source":  "imperial",
+        "category":  "IV - Atteintes portées aux services impériaux",
+        "article":  "Art. 24",
+        "title":  "Corruption active [crimina]",
+        "text":  "Est considéré comme corruption active, le fait pour une personne de rémunérer l’accomplissement ou le non-accomplissement d’un tel acte par un fonctionnaire impérial. Bannissement des offices publics, 2000 septims, 2h de travaux forcés et 2h d’emprisonnement."
+    },
+    {
+        "source":  "imperial",
+        "category":  "IV - Atteintes portées aux services impériaux",
+        "article":  "Art. 25",
+        "title":  "Abus de pouvoir public [délit]",
+        "text":  "Est considéré comme abus de pouvoir public, le fait par une personne dépositaire de l’autorité impériale, agissant dans l’exercice de ses fonctions, d’user des prérogatives, liées à ses fonctions, à des fins personnelles. Bannissement des offices publics, 500 septims, 2h de travaux forcés et 2h d’emprisonnement."
+    },
+    {
+        "source":  "imperial",
+        "category":  "IV - Atteintes portées aux services impériaux",
+        "article":  "Art. 26",
+        "title":  "Usurpation de fonction [délit]",
+        "text":  "Constitue le fait, par toute personne agissant sans titre, de s’immiscer dans l’exercice d’une fonction impériale ou fonction réglementée accomplissant l’un des actes réservés au titulaire de cette fonction. 500 septims et 3h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "IV - Atteintes portées aux services impériaux",
+        "article":  "Art. 28",
+        "title":  "Usage non-autorisé de matériel impérial [crimina]",
+        "text":  "Est considéré comme usage non-autorisé de matériel impérial toute détention d’une arme, armure ou tout autre équipement impérial par une personne non-autorisée. Saisie des biens, 150 septims par pièce d’équipement et 30mn de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "IV - Atteintes portées aux services impériaux",
+        "article":  "Art. 29",
+        "title":  "Divulgation d’information secrètes [crimina]",
+        "text":  "Constitue le fait de diffuser une information ou un document protégé par le secret impérial. Le secret est attribuable sur un document ou par voie orale par le Gouverneur ou le Légat, ou l’un de leurs représentants et peut-être levé par celui qui l’a instauré. 1000 septims et 5h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "V - Atteintes portées à la société",
+        "article":  "Art. 30",
+        "title":  "Dissimulation du visage [Contravention]",
+        "text":  "La dissimulation du visage sur la voie publique est strictement interdite. 20 septims."
+    },
+    {
+        "source":  "imperial",
+        "category":  "V - Atteintes portées à la société",
+        "article":  "Art. 31",
+        "title":  "Exhibition [Délit mineur]",
+        "text":  "Est considéré comme exhibition, le fait d’exhiber ses organes génitaux ou d’exécuter un acte sexuel à la vue d’autrui dans un lieu public. 50 septims et 1h d’emprisonnement."
+    },
+    {
+        "source":  "imperial",
+        "category":  "V - Atteintes portées à la société",
+        "article":  "Art. 32",
+        "title":  "État d’ivresse manifeste sur la voie publique [Contravention]",
+        "text":  "Est considéré comme état d’ivresse manifeste sur la voie publique, le fait pour toute personne de se trouver ivre sur la voie publique. Appréciée par les forces de l’ordre selon la situation."
+    },
+    {
+        "source":  "imperial",
+        "category":  "V - Atteintes portées à la société",
+        "article":  "Art. 33",
+        "title":  "Trouble à l’ordre public [Contravention]",
+        "text":  "Constitue un trouble à l’ordre public, une ivresse publique et manifeste, un tapage ou autres actions qui mènent au trouble de la sécurité publique ou à la quiétude. Appréciée par les forces de l’ordre selon la situation."
+    },
+    {
+        "source":  "imperial",
+        "category":  "V - Atteintes portées à la société",
+        "article":  "Art. 34",
+        "title":  "Rassemblement illégal [Délit mineur]",
+        "text":  "Est considéré comme rassemblement illégal, un attroupement d’au moins 10 personnes, sur la voie publique ou dans un lieu public, susceptible de troubler l’ordre public. 25 septims et 1h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "V - Atteintes portées à la société",
+        "article":  "Art. 35",
+        "title":  "Association de malfaiteur [délit]",
+        "text":  "Constitue une association de malfaiteurs tout groupement formé ou entente établie en vue de la préparation, caractérisée par un ou plusieurs faits matériels, d’un ou plusieurs criminas ou d’un ou plusieurs délits. 100 septims et 2h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "V - Atteintes portées à la société",
+        "article":  "Art. 36",
+        "title":  "Abus de pouvoir [délit]",
+        "text":  "Un abus de pouvoir est l’exercice excessif d’un pouvoir conféré par un statut. Il s’agit de l’utilisation de capacités en dehors du champ d’action donné, d’outrepasser ses prérogatives. L’utilisation anormale des pouvoirs donnés par une fonction est une faute grave amenant au licenciement. 500 septims et 3h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "V - Atteintes portées à la société",
+        "article":  "Art. 37",
+        "title":  "Exercice illégal d’une profession réglementée [délit]",
+        "text":  "Constitue le fait de prendre part à des pratiques ou des procédés quels qu’ils soient sans titulaire d’un titre nécessaire à l’exercice de la fonction. À l’appréciation de l’autorité locale. Professions réglementées : 1° Commerces ; 2° Alchimiste ; 3° Guérisseur ; 4° Chasseur."
+    },
+    {
+        "source":  "imperial",
+        "category":  "V - Atteintes portées à la société",
+        "article":  "Art. 38",
+        "title":  "Divulgation d’information secrète [crimina]",
+        "text":  "Constitue le fait de diffuser une information ou un document protégé par le secret professionnel, le secret des affaires, le secret industriel, religieux ou le secret médical sans autorisation de l’émetteur du secret. 500 septims et 3h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "V - Atteintes portées à la société",
+        "article":  "Art. 39",
+        "title":  "Refus d’obtempérer [Délit mineur]",
+        "text":  "Le fait, pour toute personne, d’omettre d’obtempérer à une sommation de s’arrêter émanant d’un représentant impérial s’étant présenté comme tel par voie orale ou portant l’uniforme de la Légion. 50 septims et 1h de travaux forcés. Peut être puni d’une mise en étable des cheval et du retrait de la charrette."
+    },
+    {
+        "source":  "imperial",
+        "category":  "V - Atteintes portées à la société",
+        "article":  "Art. 40",
+        "title":  "Fabrication ou vente de substances illégales [crimina]",
+        "text":  "La fabrication ou la vente de poisons, Skooma et sucre-lune est interdite. 250 septims par unité et 3h de travaux forcés pour le tout."
+    },
+    {
+        "source":  "imperial",
+        "category":  "V - Atteintes portées à la société",
+        "article":  "Art. 41",
+        "title":  "Fausse Alerte [délit]",
+        "text":  "Le fait pour toute personne, de signaler de faux évènements pouvant troubler l’ordre public. 100 septims et 1h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "VI - Atteintes à l’Empire",
+        "article":  "Art. 42",
+        "title":  "Terrorisme [crimina]",
+        "text":  "Constituent des actes de terrorisme, les infractions commises intentionnellement en relation avec une entreprise individuelle ou collective ayant pour but de troubler gravement l’ordre public par l’intimidation ou la terreur. Peine de mort et saisie des biens."
+    },
+    {
+        "source":  "imperial",
+        "category":  "VI - Atteintes à l’Empire",
+        "article":  "Art. 43",
+        "title":  "Conspiration [crimina]",
+        "text":  "Est considéré comme une union entre plusieurs personnes pour renverser le pouvoir établi, l’organisation ou la stabilité de toutes entités morales ou physiques. Peine de mort et saisie des biens."
+    },
+    {
+        "source":  "imperial",
+        "category":  "VI - Atteintes à l’Empire",
+        "article":  "Art. 44",
+        "title":  "Espionnage [crimina]",
+        "text":  "Est considéré comme espion toute personne cherchant à découvrir sans autorisation des secrets liés à l’Empire ou à un commerce situé sur territoire impérial. 1000 septims et 5h d’emprisonnement."
+    },
+    {
+        "source":  "imperial",
+        "category":  "VII - Atteintes au Gouvernement",
+        "article":  "Art. 45",
+        "title":  "Outrage au Gouverneur/Légat [crimina]",
+        "text":  "Est considéré comme outrage au Gouverneur, le fait de porter atteinte à la dignité ou au respect de sa personne ou de son titre par paroles, gestes ou menaces, par écrit ou images de toutes natures, publics ou privés ou par l’envoi d’objets quelconques jugés insultants adressés au Gouverneur ou au Légat. 500 septims et 3h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "VII - Atteintes au Gouvernement",
+        "article":  "Art. 46",
+        "title":  "Outrage à l’Empire [crimina]",
+        "text":  "Est considéré comme outrage à l’Empire, le fait de porter atteinte à sa dignité ou au respect des instances de l’Etat, dont la Légion et ses hommes, par paroles, gestes ou menaces, par écrit ou images de toutes natures, publics ou privés ou par l’envoi d’objets quelconques jugés insultants adressés à la Légion ou à l’un des représentants impériaux. 200 septims et 1h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "VII - Atteintes au Gouvernement",
+        "article":  "Art. 47",
+        "title":  "Non acquittement d’une peine pécuniaire [délit mineur]",
+        "text":  "Est considéré comme non acquittement le fait de ne pas payer une amende pendant plus 7 jours. Doublement de l’amende et 1h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "VII - Atteintes au Gouvernement",
+        "article":  "Art. 48",
+        "title":  "Non respect d’une décision de justice [délit]",
+        "text":  "Est considéré comme non respect d’une décision de justice, un manquement à une obligation, interdiction ou restriction de la part d’un condamné. À l’appréciation du juge."
+    },
+    {
+        "source":  "imperial",
+        "category":  "VII - Atteintes au Gouvernement",
+        "article":  "Art. 49",
+        "title":  "Entrave à la justice [délit]",
+        "text":  "Est considéré comme entrave à l’exercice de la justice, un délit d’interférence dans le travail des officiels de l’Empire, en tant que tiers, par interférence physique ou par mensonge. 50 septims et 1h d’emprisonnement."
+    },
+    {
+        "source":  "imperial",
+        "category":  "VII - Atteintes au Gouvernement",
+        "article":  "Art. 50",
+        "title":  "Faux [crimina]",
+        "text":  "Est considéré comme forgeage de documents toute création d’un document par une quelconque personne hormis l’autorité légale autorisée à fabriquer lesdits documents. 500 septims et 2h d’emprisonnement."
+    },
+    {
+        "source":  "imperial",
+        "category":  "VII - Atteintes au Gouvernement",
+        "article":  "Art. 51",
+        "title":  "Usage de faux [crimina]",
+        "text":  "Est considéré comme usage de faux toute utilisation d’un document issu de forgeage. 250 septims et 2h d’emprisonnement."
+    },
+    {
+        "source":  "imperial",
+        "category":  "VII - Atteintes au Gouvernement",
+        "article":  "Art. 52",
+        "title":  "Parjure [délit]",
+        "text":  "Est considéré comme parjure, le fait de mentir, ou produire de faux témoignages oraux ou écrits devant un tribunal. 200 septims et 2h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "VII - Atteintes au Gouvernement",
+        "article":  "Art. 53",
+        "title":  "Évasion [crimina]",
+        "text":  "Constitue une évasion punissable le fait, par un détenu, de se soustraire à la garde à laquelle il est soumis. 200 septims et 1h de travaux forcés. Pour l’application du présent paragraphe, est regardée comme détenue toute personne : 1° Qui est placée en garde à vue ; 2° Qui se trouve en instance ou en cours de présentation à l’autorité judiciaire à l’issue d’une garde à vue ou en exécution d’un mandat d’amener ou d’arrêt ; 3° Qui s’est vu notifier un mandat d’arrêt continuant de produire effet ; 4° Qui exécute une peine privative de liberté ou qui a été arrêtée pour exécuter cette peine ; Constitue également une évasion le fait : 5° Pour un détenu placé dans un établissement sanitaire, religieux ou hospitalier, de se soustraire à la surveillance à laquelle il est soumis ; 6° Pour tout condamné, de se soustraire au contrôle auquel il est soumis alors qu’il a fait l’objet d’une décision soit de placement à l’extérieur d’un établissement pénitentiaire, soit de détention à domicile ou qu’il bénéficie soit du régime de la semi-liberté, soit d’une permission de sortir ; 7° Pour tout condamné, de ne pas réintégrer l’établissement pénitentiaire à l’issue d’une mesure de suspension ou de fractionnement de l’emprisonnement, de placement à l’extérieur, de semi-liberté ou de permission de sortir."
+    },
+    {
+        "source":  "imperial",
+        "category":  "VII - Atteintes au Gouvernement",
+        "article":  "Art. 54",
+        "title":  "Port d’arme",
+        "text":  "Le port de l’arme est autorisé sauf pour les armes citées dans les dispositions du chapitre X."
+    },
+    {
+        "source":  "imperial",
+        "category":  "X - Du Culte",
+        "article":  "Art. 55",
+        "title":  "Religion Officielle [délit]",
+        "text":  "Le Culte des 8 Divins est la religion officielle de l’Empire. Toute adoration de Talos est prohibée. 30 minutes de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "X - Du Culte",
+        "article":  "Art. 56",
+        "title":  "Des autres religions.",
+        "text":  "Les adorations d’autres divinités sont autorisées, à condition qu’elles ne soient pas d’origine daedrique ou vénèrent un daedra."
+    },
+    {
+        "source":  "imperial",
+        "category":  "X - Du Culte",
+        "article":  "Art. 57",
+        "title":  "Culte Daedrique [crimina]",
+        "text":  "L’adoration directe ou indirecte d’un Daedra, la tentative d’invocation ou les rituels qui y sont liés sont punis de la peine de mort et de la saisie des biens."
+    },
+    {
+        "source":  "imperial",
+        "category":  "X - Du Culte",
+        "article":  "Art. 58",
+        "title":  "Possession d’artefact daedrique [crimina]",
+        "text":  "Toute possession d’un artefact daedrique est puni de la saisie de l’artefact, 500 septims d’amende et de 2h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "X - Du Culte",
+        "article":  "Art. 59",
+        "title":  "Profanation de lieu saint [crimina]",
+        "text":  "Toute profanation d’un lieu ou d’une statue liée aux 8 Divins autorisés par l’article 51 est punie de 500 septims d’amende et de 3h de travaux forcés."
+    },
+    {
+        "source":  "imperial",
+        "category":  "XI - De l’Occulte et de la Magie",
+        "article":  "Art. 60",
+        "title":  "Vampires, lycans et autres créatures d’origine daedriques [crimina]",
+        "text":  "Les créatures d’origine daedriques sont punies de la peine de mort et de la saisie des biens."
+    },
+    {
+        "source":  "imperial",
+        "category":  "XI - De l’Occulte et de la Magie",
+        "article":  "Art. 61",
+        "title":  "Nécromancie [crimina]",
+        "text":  "Toute action jugée d’arts nécromantiques (possession de biens liés à la nécromancie, sorts, recherches, rituels, etc.) est punie de la peine de mort et de la saisie des biens."
+    },
+    {
+        "source":  "imperial",
+        "category":  "XI - De l’Occulte et de la Magie",
+        "article":  "Art. 62",
+        "title":  "Usage de magie de foudre [crimina]",
+        "text":  "Due à la nature inhumaine des sorts de foudre, toute utilisation de magie de foudre est strictement interdite et sera punie de 5h de travaux forcés et de 200 septims d’amende."
+    }
+]
+;
+const allLaws = [
+    ...localLaws.map(law => ({...law, source:"local", category:"Lois locales - Estemarche / Vendeaume"})),
+    ...[
+        {
+            article:"Arrêté local I",
+            title:"Casque, capuche ou masque au Palais des Rois",
+            text:"Le port de casque, capuche ou masque à l'intérieur du Palais des Rois est interdit. Après avertissement, l'infraction entraîne une amende de 250 septims. Des sanctions plus lourdes peuvent être appliquées en cas de récidive ou de menace réelle pour la sécurité."
+        },
+        {
+            article:"Arrêté local II",
+            title:"Port ostentatoire ou usage de bâton magique",
+            text:"Le port visible ou l'utilisation de tout bâton magique est interdit dans la Châtellerie d'Estemarche, sauf pour les académiciens de l'Académie de Fortdhiver. L'infraction entraîne une amende de 2500 septims et la confiscation du bâton. Des sanctions plus lourdes peuvent être appliquées en cas de récidive ou de menace réelle."
+        },
+        {
+            article:"Arrêté local III",
+            title:"Affichage sauvage ou non autorisé",
+            text:"Tout affichage sans autorisation préalable de la Cour de Vendeaume ou d'un haut-gradé de la garde est considéré comme sauvage et entraîne une amende de 1000 septims. S'il est jugé dangereux pour l'intégrité ou la paix de la châtellerie au regard des réglementations impériales, il est considéré comme illégal et entraîne une amende de 4000 septims. Des sanctions plus lourdes peuvent être appliquées en cas de récidive ou de menace réelle."
+        }
+    ].map(law => ({...law, source:"extraLocal", category:"Arrêtés locaux supplémentaires"})),
+    ...imperialLaws
+];
+const selectedLawKeys = new Set();
+let isRestoringForm = false;
+
+function lawKey(law){
+return law.source+"|"+law.article+"|"+law.title;
+}
+
+function formatDate(d){
+return days[d.getDay()]+" "+d.getDate()+" de "+months[d.getMonth()]+", 4E 226";
+}
+
+function formatDateTimeInput(d){
+const year = d.getFullYear();
+const month = String(d.getMonth()+1).padStart(2, "0");
+const day = String(d.getDate()).padStart(2, "0");
+const hour = String(d.getHours()).padStart(2, "0");
+const minute = String(d.getMinutes()).padStart(2, "0");
+return year+"-"+month+"-"+day+"T"+hour+":"+minute;
+}
+
+function fillCurrentDateTime(force = false){
+const field = document.getElementById("datetime");
+
+if(force || !field.value){
+    field.value = formatDateTimeInput(new Date());
+}
+}
+
+function formatSkyrimHour(d){
+let hour = d.getHours();
+return hour+"ème sablier";
+}
+
+function formatIndiv(i){
+let out = `• **${i.name || "Individu non identifié"}**`;
+let meta = [];
+
+if(i.race && i.race !== "Race") meta.push(i.race);
+if(i.sex && i.sex !== "Sexe") meta.push(i.sex);
+
+if(meta.length){
+out += ` *(${meta.join(" • ")})*`;
+}
+
+if(i.phys){
+out += ` | *${i.phys}*`;
+}
+
+return out;
+}
+
+function cleanValue(value, fallback){
+return value && value.trim() ? value.trim() : fallback;
+}
+
+function quoteLines(value){
+return value.split("\n").map(line => line.trim() ? "> "+line : "> ").join("\n");
+}
+
+function textBlock(value){
+return quoteLines(value);
+}
+
+function escapeHtml(value){
+return String(value).replace(/[&<>"]/g, char => ({"&":"&amp;", "<":"&lt;", ">":"&gt;", "\"":"&quot;"}[char]));
+}
+
+function renderLawGroup(targetId, lawsToRender){
+const target = document.getElementById(targetId);
+
+if(!lawsToRender.length){
+    target.innerHTML = '<p class="law-text">Aucun article trouvé.</p>';
+    return;
+}
+
+target.innerHTML = lawsToRender.map(law => {
+    const key = lawKey(law);
+    const checked = selectedLawKeys.has(key) ? "checked" : "";
+
+    return `
+<details class="law-item">
+<summary class="law-title">
+<input type="checkbox" class="law-check" data-key="${escapeHtml(key)}" ${checked} onclick="event.stopPropagation()" onchange="toggleLawSelection(this)">
+${escapeHtml(law.article)} - ${escapeHtml(law.title)}
+</summary>
+<p class="law-text"><strong>${escapeHtml(law.category)}</strong><br>${escapeHtml(law.text)}</p>
+</details>
+`;
+}).join("");
+}
+
+function renderLawSearchResults(lawsToRender, search){
+const target = document.getElementById("lawSearchResults");
+
+if(!search){
+    target.innerHTML = "";
+    return;
+}
+
+if(!lawsToRender.length){
+    target.innerHTML = '<div class="law-result-text">Aucun article trouvé.</div>';
+    return;
+}
+
+target.innerHTML = lawsToRender.slice(0, 8).map(law => {
+    const key = lawKey(law);
+    const checked = selectedLawKeys.has(key) ? "checked" : "";
+    const source = law.source === "imperial" ? "Loi impériale / Bordeciel" : law.source === "extraLocal" ? "Arrêté local" : "Loi locale";
+    const excerpt = law.text.length > 150 ? law.text.slice(0, 150)+"..." : law.text;
+
+    return `
+<label class="law-result">
+<input type="checkbox" data-key="${escapeHtml(key)}" ${checked} onchange="toggleLawSelection(this)">
+<span>
+<span class="law-result-title">${escapeHtml(law.article)} - ${escapeHtml(law.title)}</span>
+<span class="law-result-meta">${escapeHtml(source)} · ${escapeHtml(law.category)}</span>
+<span class="law-result-text">${escapeHtml(excerpt)}</span>
+</span>
+</label>
+`;
+}).join("");
+}
+
+function renderLaws(){
+const search = document.getElementById("lawSearch").value.trim().toLowerCase();
+const filtered = allLaws.filter(law => {
+    const haystack = [law.source, law.category, law.article, law.title, law.text].join(" ").toLowerCase();
+    return !search || haystack.includes(search);
+});
+
+renderLawSearchResults(filtered, search);
+renderLawGroup("localLawList", filtered.filter(law => law.source === "local"));
+renderLawGroup("imperialLawList", filtered.filter(law => law.source === "imperial"));
+renderLawGroup("extraLocalLawList", filtered.filter(law => law.source === "extraLocal"));
+renderSelectedLawsSummary();
+updateLiveOutput();
+}
+
+function toggleLawSelection(input){
+if(input.checked){
+    selectedLawKeys.add(input.dataset.key);
+} else {
+    selectedLawKeys.delete(input.dataset.key);
+}
+
+renderSelectedLawsSummary();
+handleFormChange();
+}
+
+function renderSelectedLawsSummary(){
+const summary = document.getElementById("selectedLawsSummary");
+const selected = allLaws.filter(law => selectedLawKeys.has(lawKey(law)));
+
+if(!selected.length){
+    summary.innerHTML = "<strong>Articles sélectionnés</strong>Aucun article sélectionné.";
+    return;
+}
+
+summary.innerHTML =
+"<strong>Articles sélectionnés ("+selected.length+")</strong>"+
+"<ul>"+selected.map(law => "<li>"+escapeHtml(law.article+" - "+law.title)+"</li>").join("")+"</ul>";
+}
+
+function getSelectedLaws(){
+let selected = allLaws.filter(law => selectedLawKeys.has(lawKey(law))).map(law => {
+    const source = law.source === "imperial" ? "Loi impériale" : law.source === "extraLocal" ? "Arrêté local" : "Loi locale";
+    return "• **"+source+" - "+law.article+" - "+law.title+"**";
+});
+let customLaw = document.getElementById("customLaw").value.trim();
+
+if(customLaw){
+    selected.push(...customLaw.split("\n").filter(Boolean).map(line => "• **"+line.trim()+"**"));
+}
+
+return selected;
+}
+
+function collectFormState(){
+return {
+    mode,
+    nom: document.getElementById("nom").value,
+    lieu: document.getElementById("lieu").value,
+    datetime: document.getElementById("datetime").value,
+    rapport: document.getElementById("rapport").value,
+    faits: document.getElementById("faits").value,
+    decision: document.getElementById("decision").value,
+    jailHours: document.getElementById("jailHours").value,
+    fineAmount: document.getElementById("fineAmount").value,
+    laborHours: document.getElementById("laborHours").value,
+    customLaw: document.getElementById("customLaw").value,
+    lawSearch: document.getElementById("lawSearch").value,
+    selectedLawKeys: [...selectedLawKeys],
+    indivs: [...document.querySelectorAll(".indiv-card")].map(card => ({
+        name: card.querySelector(".name").value,
+        race: card.querySelector(".race").value,
+        sex: card.querySelector(".sex").value,
+        phys: card.querySelector(".phys").value
+    }))
+};
+}
+
+function saveFormState(){
+if(!canSaveForm) return;
+if(isRestoringForm) return;
+saveGuardName();
+localStorage.setItem(formStorageKey, JSON.stringify(collectFormState()));
+}
+
+function saveGuardName(){
+try {
+    localStorage.setItem(guardNameStorageKey, document.getElementById("nom").value);
+} catch(e) {}
+}
+
+function restoreGuardName(){
+try {
+    document.getElementById("nom").value = localStorage.getItem(guardNameStorageKey) || "";
+} catch(e) {}
+}
+
+function handleFormChange(){
+saveFormState();
+updateLiveOutput();
+}
+
+function updateLiveOutput(){
+if(!canSaveForm) return;
+generate({ silent:true });
+}
+
+function restoreFormState(){
+let saved = null;
+
+try {
+    saved = JSON.parse(localStorage.getItem(formStorageKey));
+} catch(e) {
+    saved = null;
+}
+
+if(!saved) {
+    restoreGuardName();
+    fillCurrentDateTime();
+    updateLiveOutput();
+    return;
+}
+
+isRestoringForm = true;
+restoreGuardName();
+document.getElementById("nom").value = saved.nom || document.getElementById("nom").value;
+document.getElementById("lieu").value = saved.lieu || "";
+document.getElementById("datetime").value = saved.datetime || "";
+document.getElementById("rapport").value = saved.rapport || "";
+document.getElementById("faits").value = saved.faits || "";
+document.getElementById("decision").value = saved.decision || "";
+document.getElementById("jailHours").value = saved.jailHours || "";
+document.getElementById("fineAmount").value = saved.fineAmount || "";
+document.getElementById("laborHours").value = saved.laborHours || "";
+document.getElementById("customLaw").value = saved.customLaw || "";
+document.getElementById("lawSearch").value = saved.lawSearch || "";
+
+selectedLawKeys.clear();
+(saved.selectedLawKeys || []).forEach(key => selectedLawKeys.add(key));
+renderLaws();
+
+document.getElementById("indivContainer").innerHTML = "";
+(saved.indivs && saved.indivs.length ? saved.indivs : [{}]).forEach(indiv => addIndiv(indiv));
+
+isRestoringForm = false;
+setMode(saved.mode || "rapport");
+fillCurrentDateTime();
+document.getElementById("copyStatus").textContent = "Brouillon local restauré.";
+}
+
+function bindFormAutosave(){
+["nom", "lieu", "datetime", "rapport", "faits", "decision", "customLaw", "lawSearch", "jailHours", "fineAmount", "laborHours"].forEach(id => {
+    const field = document.getElementById(id);
+    field.addEventListener("input", handleFormChange);
+    field.addEventListener("change", handleFormChange);
+});
+}
+
+function formatDuration(value, singular, plural){
+let number = Number(value);
+
+if(!number){
+    return "durée non précisée";
+}
+
+return number+" "+(number === 1 ? singular : plural);
+}
+
+function buildDecisionText(){
+let lines = [];
+let notes = document.getElementById("decision").value.trim();
+
+if(document.getElementById("jailHours").value.trim()){
+    lines.push("• Geôle : **"+formatDuration(document.getElementById("jailHours").value, "minute", "minutes")+"**");
+}
+
+if(document.getElementById("fineAmount").value.trim()){
+    let amount = document.getElementById("fineAmount").value.trim();
+    lines.push("• Amende : **"+amount+" septims**");
+}
+
+if(document.getElementById("laborHours").value.trim()){
+    lines.push("• Travaux forcés : **"+formatDuration(document.getElementById("laborHours").value, "minute", "minutes")+"**");
+}
+
+if(notes){
+    lines.push(...notes.split("\n").filter(Boolean).map(line => "• "+line.trim()));
+}
+
+return lines.length ? lines.join("\n") : "Aucune décision renseignée.";
+}
+
+function formatSignature(nom){
+let signName = cleanValue(nom, "garde non renseigné");
+
+return [
+"",
+"",
+"",
+"-# *Pour la Garde de Vendeaume,*",
+"-# *"+signName+"*"
+].join("\n");
+}
+
+function formatInlineMarkdown(value){
+let html = escapeHtml(value);
+html = html.replace(/\*\*\*(.*?)\*\*\*/g, "<strong><em>$1</em></strong>");
+html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+html = html.replace(/\*(.*?)\*/g, "<em>$1</em>");
+return html;
+}
+
+function renderDiscordPreview(text){
+const preview = document.getElementById("discordPreview");
+
+if(!preview) return;
+
+preview.innerHTML = text.split("\n").map(line => {
+    if(line.startsWith("## ")){
+        return "<h2>"+formatInlineMarkdown(line.slice(3))+"</h2>";
+    }
+
+    if(line.startsWith("### ")){
+        return "<h3>"+formatInlineMarkdown(line.slice(4))+"</h3>";
+    }
+
+    if(line === ">"){
+        return "<div class=\"preview-quote\">&nbsp;</div>";
+    }
+
+    if(line.startsWith("> ")){
+        return "<div class=\"preview-quote\">"+formatInlineMarkdown(line.slice(2))+"</div>";
+    }
+
+    if(line.startsWith("-# ")){
+        return "<div class=\"preview-small\">"+formatInlineMarkdown(line.slice(3))+"</div>";
+    }
+
+    if(!line.trim()){
+        return "<div class=\"preview-line\">&nbsp;</div>";
+    }
+
+    return "<div class=\"preview-line\">"+formatInlineMarkdown(line)+"</div>";
+}).join("");
+}
+
+function generate(options = {}){
+let nom = document.getElementById("nom").value;
+let lieu = cleanValue(document.getElementById("lieu").value, "Non renseigné");
+let dt = document.getElementById("datetime").value;
+let d = dt ? new Date(dt) : new Date();
+
+let realDate = d.toLocaleDateString("fr-FR", {
+weekday:"long",
+month:"long",
+day:"numeric"
+});
+
+let realTime = d.toLocaleTimeString("fr-FR", {
+hour:"2-digit",
+minute:"2-digit"
+});
+
+let skyrimDate = formatDate(d);
+let skyrimHour = formatSkyrimHour(d);
+let indivs = getIndivs();
+let indiv = indivs.length ? indivs.map(formatIndiv).join("\n") : "• **Aucun individu renseigné**";
+let rapport = cleanValue(document.getElementById("rapport").value, "Aucun rapport renseigné.");
+let faits = cleanValue(document.getElementById("faits").value, "Aucune description renseignée.");
+let decision = buildDecisionText();
+let selectedLaws = getSelectedLaws();
+let title = mode === "arrestation" ? "ARRESTATION DE LA GARDE" : "RAPPORT DE LA GARDE";
+
+let text =
+"## 📜 "+title+" - VENDEAUME 📜\n\n\n"+
+"Nom du garde : **"+cleanValue(nom, "Non renseigné")+"**\n"+
+"Lieu : **"+lieu+"**\n"+
+"Date de Bordeciel : "+skyrimDate+", "+skyrimHour+" ("+realDate+", "+realTime+")\n\n"+
+"### Individus concernés :\n"+quoteLines(indiv)+"\n\n";
+
+if(mode==="rapport"){
+text += "### Rapport :\n"+textBlock(rapport);
+}
+
+if(mode==="arrestation"){
+if(selectedLaws.length){
+    text += "### Articles retenus :\n"+quoteLines(selectedLaws.join("\n"))+"\n\n";
+}
+
+text += "### Description des faits :\n"+textBlock(faits);
+text += "\n\n### Décision / Peine :\n"+textBlock(decision);
+}
+
+text += formatSignature(nom);
+
+document.getElementById("output").textContent = text;
+renderDiscordPreview(text);
+if(!options.silent){
+    document.getElementById("copyStatus").textContent = "";
+}
+saveFormState();
+return text;
+}
+
+function fallbackCopyText(text){
+const area = document.createElement("textarea");
+area.value = text;
+area.setAttribute("readonly", "");
+area.style.position = "fixed";
+area.style.top = "-9999px";
+document.body.appendChild(area);
+area.select();
+const copied = document.execCommand("copy");
+document.body.removeChild(area);
+return copied;
+}
+
+async function copyReport(){
+const text = generate({ silent:true });
+
+try {
+    if(navigator.clipboard && window.isSecureContext){
+        await navigator.clipboard.writeText(text);
+    } else if(!fallbackCopyText(text)){
+        throw new Error("fallback copy failed");
+    }
+
+    document.getElementById("copyStatus").textContent = "Copié dans le presse-papiers.";
+} catch(e) {
+    document.getElementById("copyStatus").textContent = "Copie bloquée par le navigateur. Sélectionne le texte copiable puis Ctrl+C.";
+}
+}
+
+function resetForm(){
+const guardName = document.getElementById("nom").value;
+document.getElementById("lieu").value = "";
+document.getElementById("datetime").value = "";
+document.getElementById("rapport").value = "";
+document.getElementById("faits").value = "";
+document.getElementById("decision").value = "";
+document.getElementById("jailHours").value = "";
+document.getElementById("fineAmount").value = "";
+document.getElementById("laborHours").value = "";
+document.getElementById("customLaw").value = "";
+document.getElementById("lawSearch").value = "";
+selectedLawKeys.clear();
+renderLaws();
+document.getElementById("indivContainer").innerHTML = "";
+addIndiv();
+document.getElementById("nom").value = guardName;
+fillCurrentDateTime(true);
+document.getElementById("copyStatus").textContent = "Nouveau rapport prêt.";
+localStorage.removeItem(formStorageKey);
+localStorage.setItem(guardNameStorageKey, guardName);
+handleFormChange();
+}
+
+renderLaws();
+restoreFormState();
+bindFormAutosave();
+canSaveForm = true;
+handleFormChange();
+
+</script>
+
+</body>
+</html>
+
+
