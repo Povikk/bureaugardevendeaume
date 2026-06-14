@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -7,14 +7,29 @@
 <style>
 * { box-sizing: border-box; }
 
+:root {
+    --ink:#24170f;
+    --ink-soft:#6a5437;
+    --wood:#4b2f1a;
+    --wood-dark:#1b120c;
+    --brass:#b58535;
+    --paper:#efe0b8;
+    --paper-deep:#caa66b;
+    --line:rgba(54,32,18,0.42);
+    --shadow:rgba(12,8,5,0.45);
+}
+
 body {
     margin:0;
     font-family: Georgia, serif;
-    color:#2a1a12;
+    color:var(--ink);
     background:
-        linear-gradient(90deg, rgba(82,48,24,0.10) 1px, transparent 1px),
-        linear-gradient(#efe0be, #c9ad79);
-    background-size: 44px 44px, auto;
+        radial-gradient(circle at 14% 6%, rgba(168,115,47,0.28), transparent 26%),
+        radial-gradient(circle at 82% 14%, rgba(21,13,8,0.66), transparent 34%),
+        linear-gradient(90deg, rgba(214,166,88,0.05) 1px, transparent 1px),
+        linear-gradient(#3b2516, #1b120c 115%);
+    background-size:auto, auto, 46px 46px, auto;
+    min-height:100vh;
 }
 
 body::before {
@@ -26,20 +41,57 @@ body::before {
     background-image:url("https://www.transparenttextures.com/patterns/parchment.png");
 }
 
+body::after {
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    box-shadow:inset 0 0 150px rgba(0,0,0,0.62);
+}
+
 .container {
     max-width:1180px;
     margin:40px auto;
-    padding:26px;
-    background:rgba(255,248,232,0.86);
-    border:1px solid rgba(70,40,20,0.45);
-    box-shadow:0 18px 50px rgba(54,31,14,0.18);
+    padding:30px;
+    position:relative;
+    background:
+        linear-gradient(90deg, rgba(40,23,12,0.22), transparent 8%, transparent 92%, rgba(40,23,12,0.22)),
+        linear-gradient(180deg, rgba(235,213,166,0.94), rgba(190,151,89,0.90));
+    border:1px solid rgba(211,160,77,0.30);
+    box-shadow:0 28px 90px var(--shadow), inset 0 0 0 5px rgba(60,34,16,0.12);
+}
+
+.container::before,
+.container::after {
+    content:"";
+    position:absolute;
+    left:18px;
+    right:18px;
+    height:1px;
+    background:linear-gradient(90deg, transparent, rgba(83,49,22,0.42), transparent);
+}
+
+.container::before { top:14px; }
+.container::after { bottom:14px; }
+
+.app-header {
+    margin-bottom:22px;
+    text-align:center;
 }
 
 h2 {
-    margin:0 0 20px;
-    text-align:center;
-    font-size:28px;
+    margin:0;
+    font-size:30px;
     letter-spacing:0;
+    color:#1b1009;
+    text-shadow:0 1px 0 rgba(255,234,178,0.55);
+}
+
+.subtitle {
+    margin:6px 0 0;
+    color:var(--ink-soft);
+    font-style:italic;
+    font-size:14px;
 }
 
 .workspace {
@@ -63,6 +115,7 @@ label {
     display:block;
     font-weight:bold;
     margin-top:4px;
+    color:#302014;
 }
 
 .section,
@@ -74,15 +127,37 @@ label {
 
 .panel {
     padding:0;
-    border:1px solid rgba(70,40,20,0.28);
-    background:rgba(255,255,255,0.22);
+    border:1px solid var(--line);
+    background:
+        linear-gradient(180deg, rgba(239,224,184,0.70), rgba(158,116,58,0.26));
+    box-shadow:0 12px 32px rgba(18,10,5,0.18);
 }
 
 .panel > summary {
-    padding:11px 12px;
+    padding:12px 14px;
     cursor:pointer;
     font-weight:bold;
-    background:rgba(90,59,30,0.13);
+    background:linear-gradient(90deg, rgba(52,31,18,0.30), rgba(181,133,53,0.10));
+    border-bottom:1px solid rgba(70,40,20,0.16);
+    list-style:none;
+}
+
+.panel > summary::-webkit-details-marker,
+.law-panel > summary::-webkit-details-marker {
+    display:none;
+}
+
+.panel > summary::before,
+.law-panel > summary::before {
+    content:"▸";
+    display:inline-block;
+    margin-right:8px;
+    color:var(--brass);
+}
+
+.panel[open] > summary::before,
+.law-panel[open] > summary::before {
+    content:"▾";
 }
 
 .panel-body {
@@ -106,20 +181,32 @@ label {
 }
 
 .mode-btn {
-    background:#5a3b1e;
+    background:linear-gradient(#6b4725, var(--wood));
+    border:1px solid rgba(45,25,12,0.45);
+    box-shadow:inset 0 1px 0 rgba(255,231,186,0.18);
 }
 
 .mode-btn.active {
-    background:#2f1f12;
+    background:linear-gradient(#3f2a18, var(--wood-dark));
+    outline:2px solid rgba(181,133,53,0.45);
 }
 
 input, textarea, select {
     width:100%;
-    padding:10px;
+    padding:10px 11px;
     margin:6px 0 12px;
     font-family:Georgia, serif;
-    border:1px solid rgba(60,40,20,0.5);
-    background:rgba(255,255,255,0.5);
+    color:var(--ink);
+    border:1px solid rgba(60,40,20,0.42);
+    background:rgba(255,252,239,0.72);
+    box-shadow:inset 0 1px 4px rgba(72,42,18,0.08);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline:2px solid rgba(181,133,53,0.42);
+    border-color:rgba(92,55,23,0.7);
 }
 
 textarea {
@@ -130,9 +217,9 @@ textarea {
 button {
     width:100%;
     padding:10px;
-    background:#5a3b1e;
+    background:linear-gradient(#6b4725, var(--wood));
     color:#f5e6c8;
-    border:none;
+    border:1px solid rgba(45,25,12,0.42);
     font-weight:bold;
     cursor:pointer;
     margin-top:8px;
@@ -141,7 +228,7 @@ button {
 
 button:hover,
 button:focus {
-    background:#3b2414;
+    background:linear-gradient(#4b3019, #3b2414);
 }
 
 button:active {
@@ -149,7 +236,7 @@ button:active {
 }
 
 .quiet-btn {
-    background:#7a664a;
+    background:linear-gradient(#8a7352, #6f5a3f);
 }
 
 .law-list {
@@ -162,8 +249,8 @@ button:active {
 }
 
 .law-item {
-    background:rgba(255,255,255,0.35);
-    border:1px solid rgba(70,40,20,0.35);
+    background:rgba(255,252,239,0.50);
+    border:1px solid rgba(70,40,20,0.28);
     padding:10px;
 }
 
@@ -173,7 +260,7 @@ button:active {
 
 .law-panel > summary {
     padding:10px;
-    background:#5a3b1e;
+    background:linear-gradient(#6b4725, var(--wood));
     color:#f5e6c8;
     cursor:pointer;
     font-weight:bold;
@@ -190,7 +277,7 @@ button:active {
     grid-template-columns:auto 1fr;
     gap:8px;
     padding:10px;
-    background:rgba(255,255,255,0.42);
+    background:rgba(255,252,239,0.62);
     border:1px solid rgba(70,40,20,0.28);
 }
 
@@ -240,7 +327,7 @@ button:active {
 .selected-laws {
     margin:8px 0 12px;
     padding:10px;
-    background:rgba(255,255,255,0.35);
+    background:rgba(255,252,239,0.52);
     border:1px solid rgba(70,40,20,0.25);
     color:#3f2a18;
     font-size:14px;
@@ -265,7 +352,7 @@ button:active {
 
 .sentence-card {
     padding:10px;
-    background:rgba(255,255,255,0.35);
+    background:rgba(255,252,239,0.52);
     border:1px solid rgba(70,40,20,0.28);
 }
 
@@ -297,8 +384,8 @@ button:active {
     position:relative;
     padding:12px;
     margin-bottom:12px;
-    background:rgba(255,255,255,0.35);
-    border:1px solid rgba(70,40,20,0.4);
+    background:rgba(255,252,239,0.50);
+    border:1px solid rgba(70,40,20,0.32);
 }
 
 .indiv-row {
@@ -326,19 +413,20 @@ button:active {
 pre {
     margin:0;
     padding:15px;
-    background:rgba(255,255,255,0.5);
+    background:rgba(255,252,239,0.62);
     white-space:pre-wrap;
     border:1px solid rgba(60,40,20,0.4);
 }
 
 .preview-card {
     padding:16px;
-    background:#2f3136;
+    background:linear-gradient(180deg, #303238, #25272c);
     color:#dcddde;
     border:1px solid rgba(0,0,0,0.35);
     font-family:Georgia, serif;
     min-height:220px;
     white-space:normal;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.06), 0 10px 22px rgba(38,24,13,0.16);
 }
 
 .preview-card h2,
@@ -387,6 +475,10 @@ pre {
     font-style:italic;
 }
 
+#personalNotes {
+    min-height:130px;
+}
+
 @media (max-width: 700px) {
     .container {
         margin:16px;
@@ -415,7 +507,10 @@ pre {
 
 <div class="container">
 
+<div class="app-header">
 <h2>📜 BUREAU DE LA GARDE - VENDEAUME 📜</h2>
+<p class="subtitle">Rédaction des rapports, arrestations et actes de service</p>
+</div>
 
 <div class="workspace">
 <div class="form-pane">
@@ -507,6 +602,13 @@ pre {
 
 <div class="preview-pane">
 <details class="panel" open>
+<summary>Carnet de garde</summary>
+<div class="panel-body">
+<textarea id="personalNotes" placeholder="Notes privées, rappels, noms à surveiller..."></textarea>
+</div>
+</details>
+
+<details class="panel" open>
 <summary>Aperçu Discord</summary>
 <div class="panel-body">
 <div class="preview-card" id="discordPreview"></div>
@@ -527,6 +629,7 @@ pre {
 let mode = "rapport";
 const formStorageKey = "rpskyrim-current-form";
 const guardNameStorageKey = "rpskyrim-guard-name";
+const personalNotesStorageKey = "rpskyrim-personal-notes";
 let canSaveForm = false;
 
 function setMode(m){
@@ -1348,6 +1451,18 @@ try {
 } catch(e) {}
 }
 
+function savePersonalNotes(){
+try {
+    localStorage.setItem(personalNotesStorageKey, document.getElementById("personalNotes").value);
+} catch(e) {}
+}
+
+function restorePersonalNotes(){
+try {
+    document.getElementById("personalNotes").value = localStorage.getItem(personalNotesStorageKey) || "";
+} catch(e) {}
+}
+
 function handleFormChange(){
 saveFormState();
 updateLiveOutput();
@@ -1407,6 +1522,7 @@ function bindFormAutosave(){
     field.addEventListener("input", handleFormChange);
     field.addEventListener("change", handleFormChange);
 });
+document.getElementById("personalNotes").addEventListener("input", savePersonalNotes);
 }
 
 function formatDuration(value, singular, plural){
@@ -1609,6 +1725,7 @@ handleFormChange();
 }
 
 renderLaws();
+restorePersonalNotes();
 restoreFormState();
 bindFormAutosave();
 canSaveForm = true;
@@ -1618,5 +1735,6 @@ handleFormChange();
 
 </body>
 </html>
+
 
 
