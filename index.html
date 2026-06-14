@@ -281,6 +281,42 @@ button:active {
     border:1px solid rgba(70,40,20,0.28);
 }
 
+.law-result-detail {
+    display:block;
+}
+
+.law-result-detail > summary {
+    cursor:pointer;
+    list-style:none;
+}
+
+.law-result-detail > summary::-webkit-details-marker {
+    display:none;
+}
+
+.law-result-full {
+    display:block;
+    margin-top:7px;
+    padding-top:7px;
+    border-top:1px solid rgba(70,40,20,0.18);
+    color:#2f1f12;
+    font-size:13px;
+    cursor:pointer;
+}
+
+.law-result-hint {
+    display:block;
+    margin-top:4px;
+    color:rgba(63,42,24,0.55);
+    font-size:12px;
+    font-style:italic;
+}
+
+.law-result-detail[open] .law-result-text,
+.law-result-detail[open] .law-result-hint {
+    display:none;
+}
+
 .law-result input {
     width:auto;
     margin:3px 0 0;
@@ -370,6 +406,53 @@ button:active {
 
 .sentence-card input[type="number"] {
     margin-bottom:0;
+}
+
+.extra-guards {
+    display:grid;
+    gap:6px;
+    margin:6px 0 10px;
+}
+
+.extra-guard-row {
+    display:grid;
+    grid-template-columns:1fr 28px;
+    gap:6px;
+    align-items:center;
+}
+
+.extra-guard-row input {
+    margin:0;
+}
+
+.mini-btn {
+    width:auto;
+    min-height:28px;
+    padding:0;
+    margin:-4px 0 8px;
+    font-size:12px;
+    background:transparent;
+    color:rgba(47,31,18,0.68);
+    border:none;
+    box-shadow:none;
+    font-style:italic;
+    text-align:left;
+}
+
+.mini-btn:hover,
+.mini-btn:focus {
+    background:transparent;
+    color:#2f1f12;
+    text-decoration:underline;
+}
+
+.remove-mini {
+    width:28px;
+    height:28px;
+    padding:0;
+    margin:0;
+    line-height:26px;
+    background:#3b2414;
 }
 
 #copyStatus {
@@ -522,6 +605,8 @@ pre {
 
 <label>Nom du garde</label>
 <input id="nom" placeholder="Ex : Hrolf Marteau-de-Fer" oninput="saveGuardName(); handleFormChange()">
+<button class="mini-btn" type="button" onclick="addOtherGuard()">+ Autre garde présent</button>
+<div class="extra-guards" id="otherGuardsContainer"></div>
 
 <label>Lieu</label>
 <input id="lieu" placeholder="Ex : Quartier gris, Vendeaume">
@@ -703,6 +788,32 @@ addIndiv();
 function removeIndiv(button){
 button.closest(".indiv-card").remove();
 handleFormChange();
+}
+
+function addOtherGuard(name = ""){
+const container = document.getElementById("otherGuardsContainer");
+const row = document.createElement("div");
+row.className = "extra-guard-row";
+row.innerHTML = `
+<input class="other-guard-name" placeholder="Nom de l'autre garde">
+<button class="remove-mini" type="button" onclick="removeOtherGuard(this)">×</button>
+`;
+
+container.appendChild(row);
+row.querySelector(".other-guard-name").value = name || "";
+row.querySelector(".other-guard-name").addEventListener("input", handleFormChange);
+handleFormChange();
+}
+
+function removeOtherGuard(button){
+button.closest(".extra-guard-row").remove();
+handleFormChange();
+}
+
+function getOtherGuards(){
+return [...document.querySelectorAll(".other-guard-name")]
+    .map(input => input.value.trim())
+    .filter(Boolean);
 }
 
 function getIndivs(){
@@ -1339,17 +1450,31 @@ target.innerHTML = lawsToRender.slice(0, 8).map(law => {
     const key = lawKey(law);
     const checked = selectedLawKeys.has(key) ? "checked" : "";
     const source = law.source === "imperial" ? "Loi impériale / Bordeciel" : law.source === "extraLocal" ? "Arrêté local" : "Loi locale";
-    const excerpt = law.text.length > 150 ? law.text.slice(0, 150)+"..." : law.text;
-
-    return `
-<label class="law-result">
-<input type="checkbox" data-key="${escapeHtml(key)}" ${checked} onchange="toggleLawSelection(this)">
-<span>
+    const isLong = law.text.length > 150;
+    const excerpt = isLong ? law.text.slice(0, 150)+"..." : law.text;
+    const content = isLong ? `
+<details class="law-result-detail">
+<summary>
 <span class="law-result-title">${escapeHtml(law.article)} - ${escapeHtml(law.title)}</span>
 <span class="law-result-meta">${escapeHtml(source)} · ${escapeHtml(law.category)}</span>
 <span class="law-result-text">${escapeHtml(excerpt)}</span>
+<span class="law-result-hint">Cliquer pour développer</span>
+</summary>
+<span class="law-result-full" onclick="this.closest('.law-result-detail').open = false">${escapeHtml(law.text)}</span>
+</details>
+` : `
+<span class="law-result-title">${escapeHtml(law.article)} - ${escapeHtml(law.title)}</span>
+<span class="law-result-meta">${escapeHtml(source)} · ${escapeHtml(law.category)}</span>
+<span class="law-result-text">${escapeHtml(law.text)}</span>
+`;
+
+    return `
+<div class="law-result">
+<input type="checkbox" data-key="${escapeHtml(key)}" ${checked} onclick="event.stopPropagation()" onchange="toggleLawSelection(this)">
+<span>
+${content}
 </span>
-</label>
+</div>
 `;
 }).join("");
 }
@@ -1416,6 +1541,7 @@ return {
     datetime: document.getElementById("datetime").value,
     rapport: document.getElementById("rapport").value,
     faits: document.getElementById("faits").value,
+    otherGuards: getOtherGuards(),
     decision: document.getElementById("decision").value,
     jailHours: document.getElementById("jailHours").value,
     fineAmount: document.getElementById("fineAmount").value,
@@ -1509,6 +1635,9 @@ renderLaws();
 
 document.getElementById("indivContainer").innerHTML = "";
 (saved.indivs && saved.indivs.length ? saved.indivs : [{}]).forEach(indiv => addIndiv(indiv));
+document.getElementById("otherGuardsContainer").innerHTML = "";
+let restoredGuards = saved.otherGuards || (saved.guardsPresent ? saved.guardsPresent.split("\n").filter(Boolean) : []);
+restoredGuards.forEach(name => addOtherGuard(name));
 
 isRestoringForm = false;
 setMode(saved.mode || "rapport");
@@ -1636,13 +1765,15 @@ let indivs = getIndivs();
 let indiv = indivs.length ? indivs.map(formatIndiv).join("\n") : "• **Aucun individu renseigné**";
 let rapport = cleanValue(document.getElementById("rapport").value, "Aucun rapport renseigné.");
 let faits = cleanValue(document.getElementById("faits").value, "Aucune description renseignée.");
+let otherGuards = getOtherGuards();
+let otherGuardsText = otherGuards.length ? " *(Autres gardes présents : "+otherGuards.join(", ")+")*" : "";
 let decision = buildDecisionText();
 let selectedLaws = getSelectedLaws();
 let title = mode === "arrestation" ? "ARRESTATION DE LA GARDE" : "RAPPORT DE LA GARDE";
 
 let text =
 "## 📜 "+title+" - VENDEAUME 📜\n\n\n"+
-"Nom du garde : **"+cleanValue(nom, "Non renseigné")+"**\n"+
+"Nom du garde : **"+cleanValue(nom, "Non renseigné")+"**"+otherGuardsText+"\n"+
 "Lieu : **"+lieu+"**\n"+
 "Date de Bordeciel : "+skyrimDate+", "+skyrimHour+" ("+realDate+", "+realTime+")\n\n"+
 "### Individus concernés :\n"+quoteLines(indiv)+"\n\n";
@@ -1706,6 +1837,7 @@ document.getElementById("lieu").value = "";
 document.getElementById("datetime").value = "";
 document.getElementById("rapport").value = "";
 document.getElementById("faits").value = "";
+document.getElementById("otherGuardsContainer").innerHTML = "";
 document.getElementById("decision").value = "";
 document.getElementById("jailHours").value = "";
 document.getElementById("fineAmount").value = "";
