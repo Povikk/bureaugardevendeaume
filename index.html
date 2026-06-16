@@ -801,6 +801,7 @@ pre {
 }
 
 .map-card {
+    position:relative;
     display:grid;
     grid-template-columns:68px 1fr;
     gap:10px;
@@ -811,6 +812,10 @@ pre {
     cursor:pointer;
     text-align:left;
     color:var(--ink);
+}
+
+.map-card.has-actions {
+    padding-right:38px;
 }
 
 .map-card:hover,
@@ -848,6 +853,20 @@ pre {
     display:block;
     background:rgba(42,25,13,0.24);
     border:1px solid rgba(70,40,20,0.34);
+}
+
+.map-remove {
+    position:absolute;
+    top:8px;
+    right:8px;
+    width:22px;
+    height:22px;
+    padding:0;
+    margin:0;
+    border:none;
+    background:#3b2414;
+    color:white;
+    line-height:20px;
 }
 
 @media (max-width: 700px) {
@@ -1018,8 +1037,12 @@ pre {
 </details>
 
 <details class="panel" open>
-<summary>Cartes de service</summary>
+<summary class="watch-summary">
+<span class="watch-summary-title">Cartes de service</span>
+<button class="watch-add" type="button" onclick="event.stopPropagation(); openMapEditor()" onmousedown="event.stopPropagation()" title="Ajouter une carte">+</button>
+</summary>
 <div class="panel-body">
+<p class="watch-status" id="mapStatus">Cartes partagées.</p>
 <div class="map-list" id="serviceMapList"></div>
 </div>
 </details>
@@ -1085,6 +1108,19 @@ pre {
 </div>
 </div>
 
+<div class="watch-modal" id="mapEditorModal" onclick="closeMapEditor(event)">
+<div class="watch-dialog" onclick="event.stopPropagation()">
+<h3>Ajouter une carte</h3>
+<input id="mapEditorTitle" placeholder="Titre de la carte">
+<input id="mapEditorDescription" placeholder="Description courte">
+<input id="mapEditorSrc" placeholder="Lien image Postimg">
+<div class="watch-dialog-actions">
+<button type="button" onclick="saveServiceMap()">Valider</button>
+<button class="quiet-btn" type="button" onclick="closeMapEditor()">Annuler</button>
+</div>
+</div>
+</div>
+
 <div class="watch-modal" id="watchModal" onclick="closeWatchModal(event)">
 <div class="watch-dialog" onclick="event.stopPropagation()">
 <h3 id="watchModalTitle">Ajouter une personne</h3>
@@ -1143,13 +1179,17 @@ let watchBoard = { wanted: [], banned: [] };
 let indivList = [];
 let supabaseClient = null;
 let watchBoardOnline = false;
-const serviceMaps = [
+let serviceMapsOnline = false;
+const defaultServiceMaps = [
     {
+        id: "default-patrol",
+        isDefault: true,
         title: "Zones de patrouille",
         description: "Carte de service pour les rondes et secteurs de surveillance.",
         src: "https://i.postimg.cc/VwHzskL4/Copie-de-Copie-de-Copie-de-Sans-titre-38.jpg"
     }
 ];
+let serviceMaps = [...defaultServiceMaps];
 
 function setMode(m){
 mode = m;
@@ -2231,10 +2271,63 @@ async function initWatchBoardSync(){
 restoreGuardPassword();
 supabaseClient = createSupabaseClient();
 await loadWatchBoardFromSupabase();
+await loadServiceMapsFromSupabase();
 
 if(supabaseClient){
     setInterval(loadWatchBoardFromSupabase, 30000);
+    setInterval(loadServiceMapsFromSupabase, 60000);
 }
+}
+
+function setMapStatus(message){
+const status = document.getElementById("mapStatus");
+if(status) status.textContent = message;
+}
+
+function normalizeServiceMap(data = {}){
+return {
+    id: data.id || "",
+    title: data.title || "Carte sans titre",
+    description: data.description || "",
+    src: data.src || "",
+    isDefault: !!data.isDefault
+};
+}
+
+function rowToServiceMap(row){
+return normalizeServiceMap({
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    src: row.image_url
+});
+}
+
+async function loadServiceMapsFromSupabase(){
+if(!supabaseClient){
+    serviceMaps = [...defaultServiceMaps];
+    renderServiceMaps();
+    setMapStatus("Mode local : Supabase n'est pas encore chargé.");
+    return;
+}
+
+const { data, error } = await supabaseClient
+    .from("service_maps")
+    .select("*")
+    .order("created_at", { ascending:true });
+
+if(error){
+    serviceMapsOnline = false;
+    serviceMaps = [...defaultServiceMaps];
+    renderServiceMaps();
+    setMapStatus("Mode local : cartes Supabase non prêtes.");
+    return;
+}
+
+serviceMapsOnline = true;
+serviceMaps = [...defaultServiceMaps, ...(data || []).map(rowToServiceMap)];
+renderServiceMaps();
+setMapStatus("Cartes partagées synchronisées.");
 }
 
 function renderServiceMaps(){
@@ -2242,14 +2335,96 @@ const list = document.getElementById("serviceMapList");
 if(!list) return;
 
 list.innerHTML = serviceMaps.map((map, index) => `
-<button class="map-card" type="button" onclick="openMapModal(${index})">
+<div class="map-card ${map.isDefault ? "" : "has-actions"}" tabindex="0" onclick="openMapModal(${index})" onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); openMapModal(${index}); }">
+${map.isDefault ? "" : `<button class="map-remove" type="button" onclick="deleteServiceMap(event, ${index})">×</button>`}
 <img src="${escapeHtml(map.src)}" alt="${escapeHtml(map.title)}">
 <span>
 <strong>${escapeHtml(map.title)}</strong>
 <span>${escapeHtml(map.description)}</span>
 </span>
-</button>
+</div>
 `).join("");
+}
+
+function openMapEditor(){
+document.getElementById("mapEditorTitle").value = "";
+document.getElementById("mapEditorDescription").value = "";
+document.getElementById("mapEditorSrc").value = "";
+document.getElementById("mapEditorModal").classList.add("open");
+document.getElementById("mapEditorTitle").focus();
+}
+
+function closeMapEditor(event){
+if(event && event.target !== document.getElementById("mapEditorModal")) return;
+document.getElementById("mapEditorModal").classList.remove("open");
+}
+
+async function saveServiceMap(){
+if(!serviceMapsOnline || !supabaseClient){
+    setMapStatus("Impossible d'ajouter : Supabase n'est pas prêt.");
+    return;
+}
+
+const password = getGuardPassword();
+if(!password){
+    setMapStatus("Mot de passe garde requis pour ajouter une carte.");
+    return;
+}
+
+const map = normalizeServiceMap({
+    title: document.getElementById("mapEditorTitle").value.trim(),
+    description: document.getElementById("mapEditorDescription").value.trim(),
+    src: document.getElementById("mapEditorSrc").value.trim()
+});
+
+if(!map.src){
+    setMapStatus("Ajoute au moins un lien image.");
+    return;
+}
+
+const { error } = await supabaseClient.rpc("save_service_map", {
+    p_password: password,
+    p_map: {
+        title: map.title,
+        description: map.description,
+        image_url: map.src
+    }
+});
+
+if(error){
+    setMapStatus("Ajout refusé : mot de passe incorrect ou table non prête.");
+    return;
+}
+
+closeMapEditor();
+setMapStatus("Carte ajoutée.");
+await loadServiceMapsFromSupabase();
+}
+
+async function deleteServiceMap(event, index){
+event.stopPropagation();
+const map = serviceMaps[index];
+if(!map || map.isDefault) return;
+if(!confirm("Êtes-vous sûr de vouloir supprimer cette carte ?")) return;
+
+const password = getGuardPassword();
+if(!password){
+    setMapStatus("Mot de passe garde requis pour supprimer une carte.");
+    return;
+}
+
+const { error } = await supabaseClient.rpc("delete_service_map", {
+    p_password: password,
+    p_map_id: map.id
+});
+
+if(error){
+    setMapStatus("Suppression refusée : mot de passe incorrect ou table non prête.");
+    return;
+}
+
+setMapStatus("Carte supprimée.");
+await loadServiceMapsFromSupabase();
 }
 
 function openMapModal(index){
