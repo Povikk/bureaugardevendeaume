@@ -2611,11 +2611,12 @@ function renderWatchBoard(){
         let signalement = formatWatchDateTime(item.lastSeenAt);
         if(item.race && item.race !== "Race") meta.push(item.race);
         if(item.sex && item.sex !== "Sexe") meta.push(item.sex);
-        if(item.reason) meta.push(item.reason);
+        if(item.phys) meta.push(item.phys);
         if(item.context) meta.push(item.context);
-        if(signalement) details.push("Dernier signalement : "+signalement);
-        if(item.phys) details.push("Description : "+item.phys);
+        if(item.phys) details.push("Description physique : "+item.phys);
+        if(item.reason) details.push("Motif : "+item.reason);
         if(item.details) details.push("Consignes : "+item.details);
+        if(signalement) details.push("Dernier signalement : "+signalement);
         entry.title = signalement ? "Dernier signalement : "+signalement : "Cliquer pour afficher les détails";
 
         entry.innerHTML = `
