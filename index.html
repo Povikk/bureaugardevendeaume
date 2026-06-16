@@ -2236,7 +2236,10 @@ setWatchStatus("Avis synchronisés avec Supabase.");
 }
 
 async function syncWatchNotice(type, item){
-if(!watchBoardOnline || !supabaseClient) return item;
+if(!watchBoardOnline || !supabaseClient){
+    setWatchStatus("Modification bloquée : Supabase n'est pas prêt.");
+    return null;
+}
 
 const password = getGuardPassword();
 if(!password){
@@ -2258,7 +2261,10 @@ return normalizeWatchEntry({ ...item, id: data });
 }
 
 async function deleteWatchNotice(type, item){
-if(!watchBoardOnline || !supabaseClient) return true;
+if(!watchBoardOnline || !supabaseClient){
+    setWatchStatus("Suppression bloquée : Supabase n'est pas prêt.");
+    return false;
+}
 
 const password = getGuardPassword();
 if(!password){
