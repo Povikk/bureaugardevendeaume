@@ -695,6 +695,16 @@ pre {
     font-size:12px;
 }
 
+.watch-auth .watch-add.auth-ok {
+    background:linear-gradient(#4d7a3e, #345c2a);
+    color:#f4ffe9;
+}
+
+.watch-auth .watch-add.auth-bad {
+    background:linear-gradient(#8c3b32, #61251f);
+    color:#fff0ed;
+}
+
 .watch-summary {
     display:flex;
     align-items:center;
@@ -1022,8 +1032,8 @@ pre {
 <summary class="watch-summary">
 <span class="watch-summary-title">Avis de garde</span>
 <div class="watch-auth">
-<input type="password" id="guardPassword" placeholder="Mot de passe" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">
-<button class="watch-add" type="button" onclick="event.stopPropagation(); rememberGuardPassword()" onmousedown="event.stopPropagation()" title="Mémoriser sur ce navigateur">✓</button>
+<input type="password" id="guardPassword" placeholder="Mot de passe" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()" oninput="markGuardPasswordUnknown()">
+<button class="watch-add" id="guardPasswordCheck" type="button" onclick="event.stopPropagation(); rememberGuardPassword()" onmousedown="event.stopPropagation()" title="Vérifier et mémoriser sur ce navigateur">✓</button>
 </div>
 </summary>
 <div class="panel-body watch-board">
@@ -1051,7 +1061,7 @@ pre {
 <details class="panel" open>
 <summary class="watch-summary">
 <span class="watch-summary-title">Cartes de service</span>
-<button class="watch-add" type="button" onclick="event.stopPropagation(); openMapEditor()" onmousedown="event.stopPropagation()" title="Ajouter une carte">+</button>
+<button class="watch-add" type="button" onclick="openMapEditorProtected(event)" onmousedown="event.stopPropagation()" title="Ajouter une carte">+</button>
 </summary>
 <div class="panel-body">
 <p class="watch-status" id="mapStatus">Cartes partagées.</p>
@@ -2152,18 +2162,76 @@ function getGuardPassword(){
 return document.getElementById("guardPassword").value.trim();
 }
 
-function rememberGuardPassword(){
-try {
-    localStorage.setItem(guardPasswordStorageKey, getGuardPassword());
-    setWatchStatus("Mot de passe garde mémorisé sur ce navigateur.");
-} catch(e) {
-    setWatchStatus("Impossible de mémoriser le mot de passe sur ce navigateur.");
+function setGuardPasswordState(state){
+const button = document.getElementById("guardPasswordCheck");
+if(!button) return;
+button.classList.remove("auth-ok", "auth-bad");
+if(state === "ok") button.classList.add("auth-ok");
+if(state === "bad") button.classList.add("auth-bad");
 }
+
+function markGuardPasswordUnknown(){
+setGuardPasswordState("");
+}
+
+async function validateGuardPassword(showSuccess = false, statusTarget = "watch"){
+const password = getGuardPassword();
+const setStatus = statusTarget === "map" ? setMapStatus : setWatchStatus;
+
+if(!password){
+    setGuardPasswordState("bad");
+    setStatus("Mot de passe garde requis.");
+    return false;
+}
+
+if(!supabaseClient){
+    setGuardPasswordState("bad");
+    setStatus("Vérification impossible : Supabase n'est pas prêt.");
+    return false;
+}
+
+const { data, error } = await supabaseClient.rpc("guard_password_ok", {
+    p_password: password
+});
+
+if(error || data !== true){
+    setGuardPasswordState("bad");
+    setStatus("Mot de passe garde incorrect.");
+    return false;
+}
+
+setGuardPasswordState("ok");
+try {
+    localStorage.setItem(guardPasswordStorageKey, password);
+} catch(e) {}
+if(showSuccess) setStatus("Mot de passe garde validé et mémorisé sur ce navigateur.");
+return true;
+}
+
+async function rememberGuardPassword(){
+await validateGuardPassword(true, "watch");
+}
+
+async function ensureGuardPasswordReady(statusTarget = "watch"){
+if(statusTarget === "watch" && (!watchBoardOnline || !supabaseClient)){
+    setGuardPasswordState("bad");
+    setWatchStatus("Avis de garde indisponibles : Supabase n'est pas prêt.");
+    return false;
+}
+
+if(statusTarget === "map" && (!serviceMapsOnline || !supabaseClient)){
+    setGuardPasswordState("bad");
+    setMapStatus("Cartes indisponibles : Supabase n'est pas prêt.");
+    return false;
+}
+
+return validateGuardPassword(false, statusTarget);
 }
 
 function restoreGuardPassword(){
 try {
     document.getElementById("guardPassword").value = localStorage.getItem(guardPasswordStorageKey) || "";
+    markGuardPasswordUnknown();
 } catch(e) {}
 }
 
@@ -2241,22 +2309,24 @@ if(!watchBoardOnline || !supabaseClient){
     return null;
 }
 
-const password = getGuardPassword();
-if(!password){
-    setWatchStatus("Mot de passe garde requis pour modifier les avis.");
+if(!await validateGuardPassword(false, "watch")){
+    setWatchStatus("Mot de passe garde requis ou incorrect pour modifier les avis.");
     return null;
 }
 
+const password = getGuardPassword();
 const { data, error } = await supabaseClient.rpc("save_guard_notice", {
     p_password: password,
     p_notice: watchEntryToPayload(type, item)
 });
 
 if(error){
+    setGuardPasswordState("bad");
     setWatchStatus("Modification refusée : mot de passe incorrect ou table non prête.");
     return null;
 }
 
+setGuardPasswordState("ok");
 return normalizeWatchEntry({ ...item, id: data });
 }
 
@@ -2266,22 +2336,24 @@ if(!watchBoardOnline || !supabaseClient){
     return false;
 }
 
-const password = getGuardPassword();
-if(!password){
-    setWatchStatus("Mot de passe garde requis pour supprimer un avis.");
+if(!await validateGuardPassword(false, "watch")){
+    setWatchStatus("Mot de passe garde requis ou incorrect pour supprimer un avis.");
     return false;
 }
 
+const password = getGuardPassword();
 const { error } = await supabaseClient.rpc("delete_guard_notice", {
     p_password: password,
     p_notice_id: item.id
 });
 
 if(error){
+    setGuardPasswordState("bad");
     setWatchStatus("Suppression refusée : mot de passe incorrect ou table non prête.");
     return false;
 }
 
+setGuardPasswordState("ok");
 return true;
 }
 
@@ -2375,6 +2447,12 @@ document.getElementById("mapEditorModal").classList.add("open");
 document.getElementById("mapEditorTitle").focus();
 }
 
+async function openMapEditorProtected(event, map = null){
+if(event) event.stopPropagation();
+if(!await ensureGuardPasswordReady("map")) return;
+openMapEditor(map);
+}
+
 function closeMapEditor(event){
 if(event && event.target !== document.getElementById("mapEditorModal")) return;
 document.getElementById("mapEditorModal").classList.remove("open");
@@ -2386,12 +2464,12 @@ if(!serviceMapsOnline || !supabaseClient){
     return;
 }
 
-const password = getGuardPassword();
-if(!password){
-    setMapStatus("Mot de passe garde requis pour ajouter une carte.");
+if(!await validateGuardPassword(false, "map")){
+    setMapStatus("Mot de passe garde requis ou incorrect pour ajouter une carte.");
     return;
 }
 
+const password = getGuardPassword();
 const map = normalizeServiceMap({
     id: document.getElementById("mapEditorId").value.trim(),
     title: document.getElementById("mapEditorTitle").value.trim(),
@@ -2415,20 +2493,22 @@ const { error } = await supabaseClient.rpc("save_service_map", {
 });
 
 if(error){
+    setGuardPasswordState("bad");
     setMapStatus("Ajout refusé : mot de passe incorrect ou table non prête.");
     return;
 }
 
+setGuardPasswordState("ok");
 closeMapEditor();
 setMapStatus(map.id ? "Carte modifiée." : "Carte ajoutée.");
 await loadServiceMapsFromSupabase();
 }
 
-function editServiceMap(event, index){
+async function editServiceMap(event, index){
 event.stopPropagation();
 const map = serviceMaps[index];
 if(!map) return;
-openMapEditor(map);
+await openMapEditorProtected(event, map);
 }
 
 async function deleteServiceMap(event, index){
@@ -2442,22 +2522,24 @@ if(!serviceMapsOnline || !supabaseClient){
     return;
 }
 
-const password = getGuardPassword();
-if(!password){
-    setMapStatus("Mot de passe garde requis pour supprimer une carte.");
+if(!await validateGuardPassword(false, "map")){
+    setMapStatus("Mot de passe garde requis ou incorrect pour supprimer une carte.");
     return;
 }
 
+const password = getGuardPassword();
 const { error } = await supabaseClient.rpc("delete_service_map", {
     p_password: password,
     p_map_id: map.id
 });
 
 if(error){
+    setGuardPasswordState("bad");
     setMapStatus("Suppression refusée : mot de passe incorrect ou table non prête.");
     return;
 }
 
+setGuardPasswordState("ok");
 setMapStatus("Carte supprimée.");
 await loadServiceMapsFromSupabase();
 }
@@ -2550,7 +2632,8 @@ function renderWatchBoard(){
 updateWatchEmptyState();
 }
 
-function addWatchEntry(type){
+async function addWatchEntry(type){
+if(!await ensureGuardPasswordReady("watch")) return;
 openWatchModal(type);
 }
 
@@ -2628,8 +2711,9 @@ saveWatchBoardCache();
 renderWatchBoard();
 }
 
-function editWatchEntry(event, type, index){
+async function editWatchEntry(event, type, index){
 event.stopPropagation();
+if(!await ensureGuardPasswordReady("watch")) return;
 openWatchModal(type, index);
 }
 
