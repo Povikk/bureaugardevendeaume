@@ -679,18 +679,36 @@ pre {
     grid-template-columns:1fr auto;
     gap:8px;
     align-items:center;
-    padding:8px;
-    background:rgba(255,252,239,0.42);
-    border:1px solid rgba(70,40,20,0.22);
+    min-width:170px;
 }
 
 .watch-auth input {
+    padding:5px 7px;
     margin:0;
+    font-size:12px;
+}
+
+.watch-auth .watch-add {
+    width:24px;
+    height:24px;
+    line-height:22px;
+    font-size:12px;
+}
+
+.watch-summary {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.watch-summary-title {
+    white-space:nowrap;
 }
 
 .watch-status {
     min-height:18px;
-    margin:2px 0 0;
+    margin:0;
     color:rgba(63,42,24,0.62);
     font-size:12px;
     font-style:italic;
@@ -840,6 +858,7 @@ pre {
 
     .watch-form-row,
     .watch-dialog-actions,
+    .watch-summary,
     .mode-bar,
     .button-row,
     .sentence-grid {
@@ -969,15 +988,15 @@ pre {
 </details>
 
 <details class="panel" open>
-<summary>Avis de garde</summary>
-<div class="panel-body watch-board">
-<div>
+<summary class="watch-summary">
+<span class="watch-summary-title">Avis de garde</span>
 <div class="watch-auth">
-<input type="password" id="guardPassword" placeholder="Mot de passe garde">
-<button class="watch-add" type="button" onclick="rememberGuardPassword()" title="Mémoriser sur ce navigateur">✓</button>
+<input type="password" id="guardPassword" placeholder="Mot de passe" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">
+<button class="watch-add" type="button" onclick="event.stopPropagation(); rememberGuardPassword()" onmousedown="event.stopPropagation()" title="Mémoriser sur ce navigateur">✓</button>
 </div>
+</summary>
+<div class="panel-body watch-board">
 <p class="watch-status" id="watchStatus">Chargement des avis...</p>
-</div>
 <div class="watch-section">
 <div class="watch-header">
 <span class="watch-title">Personnes recherchées</span>
