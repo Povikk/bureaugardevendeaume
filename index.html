@@ -855,9 +855,9 @@ pre {
     border:1px solid rgba(70,40,20,0.34);
 }
 
-.map-remove {
+.map-remove,
+.map-edit {
     position:absolute;
-    top:8px;
     right:8px;
     width:22px;
     height:22px;
@@ -867,6 +867,18 @@ pre {
     background:#3b2414;
     color:white;
     line-height:20px;
+}
+
+.map-remove {
+    top:8px;
+    background:#3b2414;
+}
+
+.map-edit {
+    top:34px;
+    background:#6f5a3f;
+    color:#f5e6c8;
+    font-size:13px;
 }
 
 @media (max-width: 700px) {
@@ -1110,7 +1122,8 @@ pre {
 
 <div class="watch-modal" id="mapEditorModal" onclick="closeMapEditor(event)">
 <div class="watch-dialog" onclick="event.stopPropagation()">
-<h3>Ajouter une carte</h3>
+<h3 id="mapEditorTitleText">Ajouter une carte</h3>
+<input type="hidden" id="mapEditorId">
 <input id="mapEditorTitle" placeholder="Titre de la carte">
 <input id="mapEditorDescription" placeholder="Description courte">
 <input id="mapEditorSrc" placeholder="Lien image Postimg">
@@ -2336,7 +2349,10 @@ if(!list) return;
 
 list.innerHTML = serviceMaps.map((map, index) => `
 <div class="map-card ${map.isDefault ? "" : "has-actions"}" tabindex="0" onclick="openMapModal(${index})" onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); openMapModal(${index}); }">
-${map.isDefault ? "" : `<button class="map-remove" type="button" onclick="deleteServiceMap(event, ${index})">×</button>`}
+${map.isDefault ? "" : `
+<button class="map-remove" type="button" onclick="deleteServiceMap(event, ${index})" title="Supprimer">×</button>
+<button class="map-edit" type="button" onclick="editServiceMap(event, ${index})" title="Modifier">✎</button>
+`}
 <img src="${escapeHtml(map.src)}" alt="${escapeHtml(map.title)}">
 <span>
 <strong>${escapeHtml(map.title)}</strong>
@@ -2346,10 +2362,12 @@ ${map.isDefault ? "" : `<button class="map-remove" type="button" onclick="delete
 `).join("");
 }
 
-function openMapEditor(){
-document.getElementById("mapEditorTitle").value = "";
-document.getElementById("mapEditorDescription").value = "";
-document.getElementById("mapEditorSrc").value = "";
+function openMapEditor(map = null){
+document.getElementById("mapEditorTitleText").textContent = map ? "Modifier une carte" : "Ajouter une carte";
+document.getElementById("mapEditorId").value = map ? map.id : "";
+document.getElementById("mapEditorTitle").value = map ? map.title : "";
+document.getElementById("mapEditorDescription").value = map ? map.description : "";
+document.getElementById("mapEditorSrc").value = map ? map.src : "";
 document.getElementById("mapEditorModal").classList.add("open");
 document.getElementById("mapEditorTitle").focus();
 }
@@ -2372,6 +2390,7 @@ if(!password){
 }
 
 const map = normalizeServiceMap({
+    id: document.getElementById("mapEditorId").value.trim(),
     title: document.getElementById("mapEditorTitle").value.trim(),
     description: document.getElementById("mapEditorDescription").value.trim(),
     src: document.getElementById("mapEditorSrc").value.trim()
@@ -2385,6 +2404,7 @@ if(!map.src){
 const { error } = await supabaseClient.rpc("save_service_map", {
     p_password: password,
     p_map: {
+        id: map.id,
         title: map.title,
         description: map.description,
         image_url: map.src
@@ -2397,8 +2417,15 @@ if(error){
 }
 
 closeMapEditor();
-setMapStatus("Carte ajoutée.");
+setMapStatus(map.id ? "Carte modifiée." : "Carte ajoutée.");
 await loadServiceMapsFromSupabase();
+}
+
+function editServiceMap(event, index){
+event.stopPropagation();
+const map = serviceMaps[index];
+if(!map || map.isDefault) return;
+openMapEditor(map);
 }
 
 async function deleteServiceMap(event, index){
