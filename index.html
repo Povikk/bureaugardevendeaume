@@ -2186,7 +2186,7 @@ if(!password){
 
 if(!supabaseClient){
     setGuardPasswordState("bad");
-    setStatus("Vérification impossible : Supabase n'est pas prêt.");
+    setStatus("Vérification impossible : la synchronisation n'est pas prête.");
     return false;
 }
 
@@ -2215,13 +2215,13 @@ await validateGuardPassword(true, "watch");
 async function ensureGuardPasswordReady(statusTarget = "watch"){
 if(statusTarget === "watch" && (!watchBoardOnline || !supabaseClient)){
     setGuardPasswordState("bad");
-    setWatchStatus("Avis de garde indisponibles : Supabase n'est pas prêt.");
+    setWatchStatus("Avis de garde indisponibles : synchronisation non prête.");
     return false;
 }
 
 if(statusTarget === "map" && (!serviceMapsOnline || !supabaseClient)){
     setGuardPasswordState("bad");
-    setMapStatus("Cartes indisponibles : Supabase n'est pas prêt.");
+    setMapStatus("Cartes indisponibles : synchronisation non prête.");
     return false;
 }
 
@@ -2237,7 +2237,7 @@ try {
 
 function createSupabaseClient(){
 if(!window.supabase || !window.supabase.createClient){
-    setWatchStatus("Mode local : Supabase n'est pas encore chargé.");
+    setWatchStatus("Mode local : synchronisation non chargée.");
     return null;
 }
 
@@ -2287,7 +2287,7 @@ const { data, error } = await supabaseClient
 if(error){
     watchBoardOnline = false;
     restoreWatchBoard();
-    setWatchStatus("Mode local : la table Supabase des avis n'est pas prête.");
+    setWatchStatus("Mode local : les avis partagés ne sont pas prêts.");
     return;
 }
 
@@ -2300,12 +2300,12 @@ watchBoard = { wanted: [], banned: [] };
 watchBoardOnline = true;
 saveWatchBoardCache();
 renderWatchBoard();
-setWatchStatus("Avis synchronisés avec Supabase.");
+setWatchStatus("Avis synchronisés.");
 }
 
 async function syncWatchNotice(type, item){
 if(!watchBoardOnline || !supabaseClient){
-    setWatchStatus("Modification bloquée : Supabase n'est pas prêt.");
+    setWatchStatus("Modification bloquée : synchronisation non prête.");
     return null;
 }
 
@@ -2332,7 +2332,7 @@ return normalizeWatchEntry({ ...item, id: data });
 
 async function deleteWatchNotice(type, item){
 if(!watchBoardOnline || !supabaseClient){
-    setWatchStatus("Suppression bloquée : Supabase n'est pas prêt.");
+    setWatchStatus("Suppression bloquée : synchronisation non prête.");
     return false;
 }
 
@@ -2397,7 +2397,7 @@ async function loadServiceMapsFromSupabase(){
 if(!supabaseClient){
     serviceMaps = [...defaultServiceMaps];
     renderServiceMaps();
-    setMapStatus("Mode local : Supabase n'est pas encore chargé.");
+    setMapStatus("Mode local : synchronisation non chargée.");
     return;
 }
 
@@ -2410,7 +2410,7 @@ if(error){
     serviceMapsOnline = false;
     serviceMaps = [...defaultServiceMaps];
     renderServiceMaps();
-    setMapStatus("Mode local : cartes Supabase non prêtes.");
+    setMapStatus("Mode local : cartes partagées non prêtes.");
     return;
 }
 
@@ -2460,7 +2460,7 @@ document.getElementById("mapEditorModal").classList.remove("open");
 
 async function saveServiceMap(){
 if(!serviceMapsOnline || !supabaseClient){
-    setMapStatus("Impossible d'enregistrer : Supabase n'est pas prêt.");
+    setMapStatus("Impossible d'enregistrer : synchronisation non prête.");
     return;
 }
 
@@ -2518,7 +2518,7 @@ if(!map) return;
 if(!confirm("Êtes-vous sûr de vouloir supprimer cette carte ?")) return;
 
 if(!serviceMapsOnline || !supabaseClient){
-    setMapStatus("Impossible de supprimer : Supabase n'est pas prêt.");
+    setMapStatus("Impossible de supprimer : synchronisation non prête.");
     return;
 }
 
