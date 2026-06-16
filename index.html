@@ -465,17 +465,29 @@ button:active {
 
 .indiv-card {
     position:relative;
-    padding:12px;
-    margin-bottom:12px;
+    padding:8px 34px 8px 10px;
+    margin-bottom:8px;
     background:rgba(255,252,239,0.50);
     border:1px solid rgba(70,40,20,0.32);
+    cursor:pointer;
 }
 
-.indiv-row {
-    display:grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap:8px;
-    padding-right:28px;
+.indiv-card:hover,
+.indiv-card:focus {
+    background:rgba(255,252,239,0.72);
+}
+
+.indiv-card strong {
+    display:block;
+    font-size:14px;
+}
+
+.indiv-card span {
+    display:block;
+    margin-top:2px;
+    color:#5e4328;
+    font-size:12px;
+    line-height:1.25;
 }
 
 .indiv-remove {
@@ -491,6 +503,21 @@ button:active {
     cursor:pointer;
     font-size:14px;
     line-height:22px;
+}
+
+.indiv-tools {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:8px;
+}
+
+.indiv-empty {
+    margin:4px 0 0;
+    color:rgba(63,42,24,0.58);
+    font-size:13px;
+    font-style:italic;
 }
 
 pre {
@@ -562,13 +589,257 @@ pre {
     min-height:130px;
 }
 
+.watch-board {
+    display:grid;
+    gap:14px;
+}
+
+.watch-section {
+    padding:10px;
+    background:rgba(255,252,239,0.42);
+    border:1px solid rgba(70,40,20,0.24);
+}
+
+.watch-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:8px;
+}
+
+.watch-title {
+    font-weight:bold;
+    color:#302014;
+}
+
+.watch-add {
+    width:28px;
+    height:28px;
+    padding:0;
+    margin:0;
+    line-height:26px;
+}
+
+.watch-list {
+    display:grid;
+    gap:8px;
+}
+
+.watch-entry {
+    position:relative;
+    min-height:62px;
+    padding:8px 42px 8px 10px;
+    background:rgba(255,252,239,0.56);
+    border:1px solid rgba(70,40,20,0.28);
+    cursor:pointer;
+}
+
+.watch-entry:hover,
+.watch-entry:focus {
+    background:rgba(255,252,239,0.72);
+}
+
+.watch-entry strong {
+    display:block;
+    font-size:14px;
+}
+
+.watch-entry span {
+    display:block;
+    margin-top:2px;
+    color:#5e4328;
+    font-size:12px;
+    line-height:1.25;
+}
+
+.watch-detail {
+    display:none;
+    margin-top:6px;
+    padding-top:6px;
+    border-top:1px solid rgba(70,40,20,0.16);
+    color:#3f2a18;
+    font-size:12px;
+    line-height:1.35;
+}
+
+.watch-entry.open .watch-detail {
+    display:block;
+}
+
+.watch-empty {
+    margin:4px 0 0;
+    color:rgba(63,42,24,0.58);
+    font-size:13px;
+    font-style:italic;
+}
+
+.watch-auth {
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:8px;
+    align-items:center;
+    padding:8px;
+    background:rgba(255,252,239,0.42);
+    border:1px solid rgba(70,40,20,0.22);
+}
+
+.watch-auth input {
+    margin:0;
+}
+
+.watch-status {
+    min-height:18px;
+    margin:2px 0 0;
+    color:rgba(63,42,24,0.62);
+    font-size:12px;
+    font-style:italic;
+}
+
+.watch-remove {
+    position:absolute;
+    top:7px;
+    right:8px;
+    width:22px;
+    height:22px;
+    padding:0;
+    margin:0;
+    border:none;
+    background:#3b2414;
+    color:white;
+    line-height:20px;
+}
+
+.watch-edit {
+    position:absolute;
+    top:33px;
+    right:8px;
+    width:22px;
+    height:22px;
+    padding:0;
+    margin:0;
+    border:none;
+    background:#6f5a3f;
+    color:#f5e6c8;
+    line-height:20px;
+    font-size:13px;
+}
+
+.watch-form-row {
+    display:grid;
+    grid-template-columns:2fr 1fr 1fr;
+    gap:8px;
+}
+
+.watch-form-row input,
+.watch-form-row select {
+    margin-top:0;
+}
+
+.watch-modal {
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    background:rgba(18,10,5,0.54);
+    z-index:20;
+}
+
+.watch-modal.open {
+    display:flex;
+}
+
+.watch-dialog {
+    width:min(520px, 100%);
+    max-height:92vh;
+    overflow:auto;
+    padding:16px;
+    background:
+        linear-gradient(180deg, rgba(239,224,184,0.98), rgba(199,161,97,0.96));
+    border:1px solid rgba(70,40,20,0.46);
+    box-shadow:0 24px 70px rgba(12,8,5,0.48);
+}
+
+.watch-dialog h3 {
+    margin:0 0 10px;
+    font-size:18px;
+}
+
+.watch-dialog textarea {
+    min-height:66px;
+}
+
+.watch-dialog-actions {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.map-list {
+    display:grid;
+    gap:8px;
+}
+
+.map-card {
+    display:grid;
+    grid-template-columns:68px 1fr;
+    gap:10px;
+    align-items:center;
+    padding:8px;
+    background:rgba(255,252,239,0.54);
+    border:1px solid rgba(70,40,20,0.28);
+    cursor:pointer;
+    text-align:left;
+    color:var(--ink);
+}
+
+.map-card:hover,
+.map-card:focus {
+    background:rgba(255,252,239,0.74);
+}
+
+.map-card img {
+    width:68px;
+    height:48px;
+    object-fit:cover;
+    border:1px solid rgba(70,40,20,0.32);
+}
+
+.map-card strong {
+    display:block;
+    font-size:14px;
+}
+
+.map-card span {
+    display:block;
+    margin-top:2px;
+    color:#5e4328;
+    font-size:12px;
+}
+
+.map-dialog {
+    width:min(940px, 96vw);
+}
+
+.map-dialog img {
+    width:100%;
+    max-height:78vh;
+    object-fit:contain;
+    display:block;
+    background:rgba(42,25,13,0.24);
+    border:1px solid rgba(70,40,20,0.34);
+}
+
 @media (max-width: 700px) {
     .container {
         margin:16px;
         padding:18px;
     }
 
-    .indiv-row,
+    .watch-form-row,
+    .watch-dialog-actions,
     .mode-bar,
     .button-row,
     .sentence-grid {
@@ -617,8 +888,12 @@ pre {
 <details class="panel" open>
 <summary>Individus concernés</summary>
 <div class="panel-body">
+<div class="indiv-tools">
+<span class="watch-title">Individus du rapport</span>
+<button class="watch-add" type="button" onclick="addIndiv()" title="Ajouter un individu">+</button>
+</div>
 <div id="indivContainer"></div>
-<button type="button" onclick="addIndiv()">Ajouter un individu</button>
+<p class="indiv-empty" id="indivEmpty">Aucun individu renseigné.</p>
 </div>
 </details>
 
@@ -694,6 +969,43 @@ pre {
 </details>
 
 <details class="panel" open>
+<summary>Avis de garde</summary>
+<div class="panel-body watch-board">
+<div>
+<div class="watch-auth">
+<input type="password" id="guardPassword" placeholder="Mot de passe garde">
+<button class="watch-add" type="button" onclick="rememberGuardPassword()" title="Mémoriser sur ce navigateur">✓</button>
+</div>
+<p class="watch-status" id="watchStatus">Chargement des avis...</p>
+</div>
+<div class="watch-section">
+<div class="watch-header">
+<span class="watch-title">Personnes recherchées</span>
+<button class="watch-add" type="button" onclick="addWatchEntry('wanted')" title="Ajouter une personne recherchée">+</button>
+</div>
+<div class="watch-list" id="wantedList"></div>
+<p class="watch-empty" id="wantedEmpty">Aucune personne recherchée.</p>
+</div>
+
+<div class="watch-section">
+<div class="watch-header">
+<span class="watch-title">Personnes bannies</span>
+<button class="watch-add" type="button" onclick="addWatchEntry('banned')" title="Ajouter une personne bannie">+</button>
+</div>
+<div class="watch-list" id="bannedList"></div>
+<p class="watch-empty" id="bannedEmpty">Aucune personne bannie.</p>
+</div>
+</div>
+</details>
+
+<details class="panel" open>
+<summary>Cartes de service</summary>
+<div class="panel-body">
+<div class="map-list" id="serviceMapList"></div>
+</div>
+</details>
+
+<details class="panel" open>
 <summary>Aperçu Discord</summary>
 <div class="panel-body">
 <div class="preview-card" id="discordPreview"></div>
@@ -709,13 +1021,116 @@ pre {
 
 </div>
 
+<div class="watch-modal" id="indivModal" onclick="closeIndivModal(event)">
+<div class="watch-dialog" onclick="event.stopPropagation()">
+<h3 id="indivModalTitle">Ajouter un individu</h3>
+<input type="hidden" id="indivModalIndex">
+
+<div class="watch-form-row">
+<input id="indivModalName" placeholder="Nom de l'individu">
+<select id="indivModalRace">
+<option>Race</option>
+<option>Nordique</option>
+<option>Impérial</option>
+<option>Bréton</option>
+<option>Rougegarde</option>
+<option>Dunmer</option>
+<option>Altmer</option>
+<option>Bosmer</option>
+<option>Orque</option>
+<option>Khajiit</option>
+<option>Argonien</option>
+</select>
+<select id="indivModalSex">
+<option>Sexe</option>
+<option>Homme</option>
+<option>Femme</option>
+<option>Non défini</option>
+</select>
+</div>
+
+<textarea id="indivModalPhys" placeholder="Description physique (optionnel)"></textarea>
+
+<div class="watch-dialog-actions">
+<button type="button" onclick="saveIndivModal()">Valider</button>
+<button class="quiet-btn" type="button" onclick="closeIndivModal()">Annuler</button>
+</div>
+</div>
+</div>
+
+<div class="watch-modal" id="mapModal" onclick="closeMapModal(event)">
+<div class="watch-dialog map-dialog" onclick="event.stopPropagation()">
+<h3 id="mapModalTitle">Carte</h3>
+<img id="mapModalImage" src="" alt="">
+<button class="quiet-btn" type="button" onclick="closeMapModal()">Fermer</button>
+</div>
+</div>
+
+<div class="watch-modal" id="watchModal" onclick="closeWatchModal(event)">
+<div class="watch-dialog" onclick="event.stopPropagation()">
+<h3 id="watchModalTitle">Ajouter une personne</h3>
+<input type="hidden" id="watchModalType">
+<input type="hidden" id="watchModalIndex">
+
+<div class="watch-form-row">
+<input id="watchModalName" placeholder="Nom">
+<select id="watchModalRace">
+<option>Race</option>
+<option>Nordique</option>
+<option>Impérial</option>
+<option>Bréton</option>
+<option>Rougegarde</option>
+<option>Dunmer</option>
+<option>Altmer</option>
+<option>Bosmer</option>
+<option>Orque</option>
+<option>Khajiit</option>
+<option>Argonien</option>
+</select>
+<select id="watchModalSex">
+<option>Sexe</option>
+<option>Homme</option>
+<option>Femme</option>
+<option>Non défini</option>
+</select>
+</div>
+
+<textarea id="watchModalPhys" placeholder="Description physique (optionnel)"></textarea>
+<input id="watchModalContext" placeholder="Dernier lieu vu ou zone concernée">
+<input type="datetime-local" id="watchModalDateTime" title="Date et heure du dernier signalement">
+<input id="watchModalReason" placeholder="Motif">
+<textarea id="watchModalDetails" placeholder="Consignes, dangerosité, durée, détails utiles..."></textarea>
+
+<div class="watch-dialog-actions">
+<button type="button" onclick="saveWatchModal()">Valider</button>
+<button class="quiet-btn" type="button" onclick="closeWatchModal()">Annuler</button>
+</div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 
 let mode = "rapport";
 const formStorageKey = "rpskyrim-current-form";
 const guardNameStorageKey = "rpskyrim-guard-name";
 const personalNotesStorageKey = "rpskyrim-personal-notes";
+const watchBoardStorageKey = "rpskyrim-watch-board";
+const guardPasswordStorageKey = "rpskyrim-guard-password";
+const supabaseUrl = "https://lrtjsbkajnbnfhlsetgl.supabase.co";
+const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxydGpzYmtham5ibmZobHNldGdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MzEyMTQsImV4cCI6MjA5NzAwNzIxNH0.gzoaDhcb5tASazihEcR6z7veb-agfAvTRKA0QjZjk2Y";
 let canSaveForm = false;
+let watchBoard = { wanted: [], banned: [] };
+let indivList = [];
+let supabaseClient = null;
+let watchBoardOnline = false;
+const serviceMaps = [
+    {
+        title: "Zones de patrouille",
+        description: "Carte de service pour les rondes et secteurs de surveillance.",
+        src: "https://i.postimg.cc/VwHzskL4/Copie-de-Copie-de-Copie-de-Sans-titre-38.jpg"
+    }
+];
 
 function setMode(m){
 mode = m;
@@ -732,61 +1147,118 @@ document.getElementById("arrestationBox").style.display =
 handleFormChange();
 }
 
-function addIndiv(data = {}){
-const c = document.getElementById("indivContainer");
-const d = document.createElement("div");
-d.className = "indiv-card";
-
-d.innerHTML = `
-<button class="indiv-remove" type="button" onclick="removeIndiv(this)">×</button>
-
-<div class="indiv-row">
-<input class="name" placeholder="Nom de l'individu">
-
-<select class="race">
-<option>Race</option>
-<option>Nordique</option>
-<option>Impérial</option>
-<option>Bréton</option>
-<option>Rougegarde</option>
-<option>Dunmer</option>
-<option>Altmer</option>
-<option>Bosmer</option>
-<option>Orque</option>
-<option>Khajiit</option>
-<option>Argonien</option>
-</select>
-
-<select class="sex">
-<option>Sexe</option>
-<option>Homme</option>
-<option>Femme</option>
-<option>Non défini</option>
-</select>
-</div>
-
-<textarea class="phys" placeholder="Description physique (optionnel)"></textarea>
-`;
-
-c.appendChild(d);
-
-d.querySelector(".name").value = data.name || "";
-d.querySelector(".race").value = data.race || "Race";
-d.querySelector(".sex").value = data.sex || "Sexe";
-d.querySelector(".phys").value = data.phys || "";
-
-d.querySelectorAll("input, select, textarea").forEach(field => {
-    field.addEventListener("input", handleFormChange);
-    field.addEventListener("change", handleFormChange);
-});
-
-handleFormChange();
+function normalizeIndiv(data = {}){
+return {
+    name: data.name || "",
+    race: data.race || "Race",
+    sex: data.sex || "Sexe",
+    phys: data.phys || ""
+};
 }
 
-addIndiv();
+function hasIndivContent(indiv){
+return indiv.name.trim() ||
+    indiv.race !== "Race" ||
+    indiv.sex !== "Sexe" ||
+    indiv.phys.trim();
+}
 
-function removeIndiv(button){
-button.closest(".indiv-card").remove();
+function renderIndivs(){
+const container = document.getElementById("indivContainer");
+container.innerHTML = "";
+
+indivList.forEach((indiv, index) => {
+    const card = document.createElement("div");
+    card.className = "indiv-card";
+    card.tabIndex = 0;
+    card.onclick = () => openIndivModal(index);
+    card.onkeydown = event => {
+        if(event.key === "Enter" || event.key === " "){
+            event.preventDefault();
+            openIndivModal(index);
+        }
+    };
+
+    let meta = [];
+    if(indiv.race && indiv.race !== "Race") meta.push(indiv.race);
+    if(indiv.sex && indiv.sex !== "Sexe") meta.push(indiv.sex);
+    if(indiv.phys) meta.push(indiv.phys);
+
+    card.innerHTML = `
+<button class="indiv-remove" type="button" onclick="removeIndiv(event, ${index})">×</button>
+<strong>${escapeHtml(indiv.name || "Individu non identifié")}</strong>
+<span>${escapeHtml(meta.length ? meta.join(" • ") : "Cliquer pour compléter la fiche")}</span>
+`;
+    container.appendChild(card);
+});
+
+updateIndivEmptyState();
+}
+
+function addIndiv(data){
+if(data && hasIndivContent(normalizeIndiv(data))){
+    indivList.push(normalizeIndiv(data));
+    renderIndivs();
+    handleFormChange();
+    return;
+}
+
+openIndivModal();
+}
+
+function openIndivModal(index = ""){
+const indiv = index === "" ? normalizeIndiv() : normalizeIndiv(indivList[index]);
+document.getElementById("indivModalIndex").value = index;
+document.getElementById("indivModalTitle").textContent =
+    index === "" ? "Ajouter un individu" : "Modifier un individu";
+document.getElementById("indivModalName").value = indiv.name;
+document.getElementById("indivModalRace").value = indiv.race;
+document.getElementById("indivModalSex").value = indiv.sex;
+document.getElementById("indivModalPhys").value = indiv.phys;
+document.getElementById("indivModal").classList.add("open");
+document.getElementById("indivModalName").focus();
+}
+
+function closeIndivModal(event){
+if(event && event.target !== document.getElementById("indivModal")) return;
+document.getElementById("indivModal").classList.remove("open");
+}
+
+function saveIndivModal(){
+const index = document.getElementById("indivModalIndex").value;
+const indiv = normalizeIndiv({
+    name: document.getElementById("indivModalName").value,
+    race: document.getElementById("indivModalRace").value,
+    sex: document.getElementById("indivModalSex").value,
+    phys: document.getElementById("indivModalPhys").value
+});
+
+if(!hasIndivContent(indiv)){
+    if(index !== ""){
+        indivList.splice(Number(index), 1);
+        renderIndivs();
+        handleFormChange();
+    }
+    closeIndivModal();
+    return;
+}
+
+if(index === ""){
+    indivList.push(indiv);
+} else {
+    indivList[Number(index)] = indiv;
+}
+
+renderIndivs();
+handleFormChange();
+closeIndivModal();
+}
+
+function removeIndiv(event, index){
+event.stopPropagation();
+if(!confirm("Êtes-vous sûr de vouloir supprimer l'individu ?")) return;
+indivList.splice(index, 1);
+renderIndivs();
 handleFormChange();
 }
 
@@ -817,12 +1289,12 @@ return [...document.querySelectorAll(".other-guard-name")]
 }
 
 function getIndivs(){
-return [...document.querySelectorAll(".indiv-card")].map(c => ({
-name: c.querySelector(".name").value.trim(),
-race: c.querySelector(".race").value,
-sex: c.querySelector(".sex").value,
-phys: c.querySelector(".phys").value.trim()
-})).filter(i => i.name || i.race !== "Race" || i.sex !== "Sexe" || i.phys);
+return indivList.map(normalizeIndiv).filter(hasIndivContent);
+}
+
+function updateIndivEmptyState(){
+document.getElementById("indivEmpty").style.display =
+indivList.length ? "none" : "block";
 }
 
 const months=["Primétoile","Clairciel","Semailles","Ondepluie","Plantaisons","Mi-l'An","Hautzénith","Vifazur","Âtrefeu","Soufflegivre","Sombreciel","Soirétoile"];
@@ -1409,6 +1881,22 @@ function escapeHtml(value){
 return String(value).replace(/[&<>"]/g, char => ({"&":"&amp;", "<":"&lt;", ">":"&gt;", "\"":"&quot;"}[char]));
 }
 
+function formatWatchDateTime(value){
+if(!value) return "";
+let date = new Date(value);
+if(Number.isNaN(date.getTime())) return value;
+let skyrim = formatDate(date)+", "+formatSkyrimHour(date);
+let real = date.toLocaleDateString("fr-FR", {
+    day:"2-digit",
+    month:"2-digit",
+    year:"numeric"
+})+" "+date.toLocaleTimeString("fr-FR", {
+    hour:"2-digit",
+    minute:"2-digit"
+});
+return skyrim+" ("+real+")";
+}
+
 function renderLawGroup(targetId, lawsToRender){
 const target = document.getElementById(targetId);
 
@@ -1549,12 +2037,7 @@ return {
     customLaw: document.getElementById("customLaw").value,
     lawSearch: document.getElementById("lawSearch").value,
     selectedLawKeys: [...selectedLawKeys],
-    indivs: [...document.querySelectorAll(".indiv-card")].map(card => ({
-        name: card.querySelector(".name").value,
-        race: card.querySelector(".race").value,
-        sex: card.querySelector(".sex").value,
-        phys: card.querySelector(".phys").value
-    }))
+    indivs: getIndivs()
 };
 }
 
@@ -1589,6 +2072,372 @@ try {
 } catch(e) {}
 }
 
+function setWatchStatus(message){
+const status = document.getElementById("watchStatus");
+if(status) status.textContent = message;
+}
+
+function getGuardPassword(){
+return document.getElementById("guardPassword").value.trim();
+}
+
+function rememberGuardPassword(){
+try {
+    localStorage.setItem(guardPasswordStorageKey, getGuardPassword());
+    setWatchStatus("Mot de passe garde mémorisé sur ce navigateur.");
+} catch(e) {
+    setWatchStatus("Impossible de mémoriser le mot de passe sur ce navigateur.");
+}
+}
+
+function restoreGuardPassword(){
+try {
+    document.getElementById("guardPassword").value = localStorage.getItem(guardPasswordStorageKey) || "";
+} catch(e) {}
+}
+
+function createSupabaseClient(){
+if(!window.supabase || !window.supabase.createClient){
+    setWatchStatus("Mode local : Supabase n'est pas encore chargé.");
+    return null;
+}
+
+return window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+}
+
+function rowToWatchEntry(row){
+return normalizeWatchEntry({
+    id: row.id,
+    name: row.name,
+    race: row.race,
+    sex: row.sex,
+    phys: row.phys,
+    context: row.context,
+    lastSeenAt: row.last_seen_at,
+    reason: row.reason,
+    details: row.details
+});
+}
+
+function watchEntryToPayload(type, item){
+return {
+    id: item.id || null,
+    notice_type: type,
+    name: item.name,
+    race: item.race,
+    sex: item.sex,
+    phys: item.phys,
+    context: item.context,
+    last_seen_at: item.lastSeenAt,
+    reason: item.reason,
+    details: item.details
+};
+}
+
+async function loadWatchBoardFromSupabase(){
+if(!supabaseClient){
+    restoreWatchBoard();
+    return;
+}
+
+const { data, error } = await supabaseClient
+    .from("guard_notices")
+    .select("*")
+    .order("updated_at", { ascending:false });
+
+if(error){
+    watchBoardOnline = false;
+    restoreWatchBoard();
+    setWatchStatus("Mode local : la table Supabase des avis n'est pas prête.");
+    return;
+}
+
+watchBoard = { wanted: [], banned: [] };
+(data || []).forEach(row => {
+    const type = row.notice_type === "banned" ? "banned" : "wanted";
+    watchBoard[type].push(rowToWatchEntry(row));
+});
+
+watchBoardOnline = true;
+saveWatchBoardCache();
+renderWatchBoard();
+setWatchStatus("Avis synchronisés avec Supabase.");
+}
+
+async function syncWatchNotice(type, item){
+if(!watchBoardOnline || !supabaseClient) return item;
+
+const password = getGuardPassword();
+if(!password){
+    setWatchStatus("Mot de passe garde requis pour modifier les avis.");
+    return null;
+}
+
+const { data, error } = await supabaseClient.rpc("save_guard_notice", {
+    p_password: password,
+    p_notice: watchEntryToPayload(type, item)
+});
+
+if(error){
+    setWatchStatus("Modification refusée : mot de passe incorrect ou table non prête.");
+    return null;
+}
+
+return normalizeWatchEntry({ ...item, id: data });
+}
+
+async function deleteWatchNotice(type, item){
+if(!watchBoardOnline || !supabaseClient) return true;
+
+const password = getGuardPassword();
+if(!password){
+    setWatchStatus("Mot de passe garde requis pour supprimer un avis.");
+    return false;
+}
+
+const { error } = await supabaseClient.rpc("delete_guard_notice", {
+    p_password: password,
+    p_notice_id: item.id
+});
+
+if(error){
+    setWatchStatus("Suppression refusée : mot de passe incorrect ou table non prête.");
+    return false;
+}
+
+return true;
+}
+
+async function initWatchBoardSync(){
+restoreGuardPassword();
+supabaseClient = createSupabaseClient();
+await loadWatchBoardFromSupabase();
+
+if(supabaseClient){
+    setInterval(loadWatchBoardFromSupabase, 30000);
+}
+}
+
+function renderServiceMaps(){
+const list = document.getElementById("serviceMapList");
+if(!list) return;
+
+list.innerHTML = serviceMaps.map((map, index) => `
+<button class="map-card" type="button" onclick="openMapModal(${index})">
+<img src="${escapeHtml(map.src)}" alt="${escapeHtml(map.title)}">
+<span>
+<strong>${escapeHtml(map.title)}</strong>
+<span>${escapeHtml(map.description)}</span>
+</span>
+</button>
+`).join("");
+}
+
+function openMapModal(index){
+const map = serviceMaps[index];
+if(!map) return;
+
+document.getElementById("mapModalTitle").textContent = map.title;
+document.getElementById("mapModalImage").src = map.src;
+document.getElementById("mapModalImage").alt = map.title;
+document.getElementById("mapModal").classList.add("open");
+}
+
+function closeMapModal(event){
+if(event && event.target !== document.getElementById("mapModal")) return;
+document.getElementById("mapModal").classList.remove("open");
+}
+
+function getWatchLabel(type){
+return type === "wanted" ? "personne recherchée" : "personne bannie";
+}
+
+function normalizeWatchEntry(data = {}){
+let previousDate = data.lastSeenDate ? data.lastSeenDate+"T00:00" : "";
+return {
+    id: data.id || "",
+    name: data.name || "",
+    race: data.race || "Race",
+    sex: data.sex || "Sexe",
+    phys: data.phys || "",
+    context: data.context || "",
+    lastSeenAt: data.lastSeenAt || previousDate,
+    reason: data.reason || "",
+    details: data.details || ""
+};
+}
+
+function hasWatchContent(item){
+return item.name.trim() ||
+    item.race !== "Race" ||
+    item.sex !== "Sexe" ||
+    item.phys.trim() ||
+    item.context.trim() ||
+    item.lastSeenAt ||
+    item.reason.trim() ||
+    item.details.trim();
+}
+
+function renderWatchBoard(){
+["wanted", "banned"].forEach(type => {
+    const list = document.getElementById(type === "wanted" ? "wantedList" : "bannedList");
+    list.innerHTML = "";
+
+    watchBoard[type].forEach((item, index) => {
+        const entry = document.createElement("div");
+        entry.className = "watch-entry";
+        entry.tabIndex = 0;
+        entry.onclick = () => entry.classList.toggle("open");
+        entry.onkeydown = event => {
+            if(event.key === "Enter" || event.key === " "){
+                event.preventDefault();
+                entry.classList.toggle("open");
+            }
+        };
+
+        let meta = [];
+        let details = [];
+        let signalement = formatWatchDateTime(item.lastSeenAt);
+        if(item.race && item.race !== "Race") meta.push(item.race);
+        if(item.sex && item.sex !== "Sexe") meta.push(item.sex);
+        if(item.reason) meta.push(item.reason);
+        if(item.context) meta.push(item.context);
+        if(signalement) details.push("Dernier signalement : "+signalement);
+        if(item.phys) details.push("Description : "+item.phys);
+        if(item.details) details.push("Consignes : "+item.details);
+        entry.title = signalement ? "Dernier signalement : "+signalement : "Cliquer pour afficher les détails";
+
+        entry.innerHTML = `
+<button class="watch-remove" type="button" onclick="removeWatchEntry(event, '${type}', ${index})">×</button>
+<button class="watch-edit" type="button" onclick="editWatchEntry(event, '${type}', ${index})" title="Modifier">✎</button>
+<strong>${escapeHtml(item.name || "Personne non identifiée")}</strong>
+<span>${escapeHtml(meta.length ? meta.join(" • ") : "Cliquer pour compléter la fiche")}</span>
+<div class="watch-detail">${details.length ? details.map(escapeHtml).join("<br>") : "Aucun détail supplémentaire."}</div>
+`;
+        list.appendChild(entry);
+    });
+});
+
+updateWatchEmptyState();
+}
+
+function addWatchEntry(type){
+openWatchModal(type);
+}
+
+function openWatchModal(type, index = ""){
+const item = index === "" ? normalizeWatchEntry() : normalizeWatchEntry(watchBoard[type][index]);
+document.getElementById("watchModalType").value = type;
+document.getElementById("watchModalIndex").value = index;
+document.getElementById("watchModalTitle").textContent =
+    (index === "" ? "Ajouter une " : "Modifier une ")+getWatchLabel(type);
+document.getElementById("watchModalName").value = item.name;
+document.getElementById("watchModalRace").value = item.race;
+document.getElementById("watchModalSex").value = item.sex;
+document.getElementById("watchModalPhys").value = item.phys;
+document.getElementById("watchModalContext").value = item.context;
+document.getElementById("watchModalDateTime").value = item.lastSeenAt;
+document.getElementById("watchModalReason").value = item.reason;
+document.getElementById("watchModalDetails").value = item.details;
+document.getElementById("watchModal").classList.add("open");
+document.getElementById("watchModalName").focus();
+}
+
+function closeWatchModal(event){
+if(event && event.target !== document.getElementById("watchModal")) return;
+document.getElementById("watchModal").classList.remove("open");
+}
+
+async function saveWatchModal(){
+const type = document.getElementById("watchModalType").value;
+const index = document.getElementById("watchModalIndex").value;
+const item = normalizeWatchEntry({
+    name: document.getElementById("watchModalName").value,
+    race: document.getElementById("watchModalRace").value,
+    sex: document.getElementById("watchModalSex").value,
+    phys: document.getElementById("watchModalPhys").value,
+    context: document.getElementById("watchModalContext").value,
+    lastSeenAt: document.getElementById("watchModalDateTime").value,
+    reason: document.getElementById("watchModalReason").value,
+    details: document.getElementById("watchModalDetails").value
+});
+
+if(!hasWatchContent(item)){
+    closeWatchModal();
+    return;
+}
+
+if(index !== ""){
+    item.id = watchBoard[type][Number(index)].id || "";
+}
+
+const syncedItem = await syncWatchNotice(type, item);
+if(!syncedItem) return;
+
+if(index === ""){
+    watchBoard[type].push(syncedItem);
+} else {
+    watchBoard[type][Number(index)] = syncedItem;
+}
+
+saveWatchBoardCache();
+renderWatchBoard();
+closeWatchModal();
+}
+
+async function removeWatchEntry(event, type, index){
+event.stopPropagation();
+const label = type === "wanted" ? "la personne recherchée" : "la personne bannie";
+if(!confirm("Êtes-vous sûr de vouloir supprimer "+label+" ?")) return;
+
+const item = watchBoard[type][index];
+const deleted = await deleteWatchNotice(type, item);
+if(!deleted) return;
+
+watchBoard[type].splice(index, 1);
+saveWatchBoardCache();
+renderWatchBoard();
+}
+
+function editWatchEntry(event, type, index){
+event.stopPropagation();
+openWatchModal(type, index);
+}
+
+function saveWatchBoardCache(){
+try {
+    localStorage.setItem(watchBoardStorageKey, JSON.stringify(watchBoard));
+} catch(e) {}
+}
+
+function saveWatchBoard(){
+saveWatchBoardCache();
+}
+
+function restoreWatchBoard(){
+let saved = null;
+
+try {
+    saved = JSON.parse(localStorage.getItem(watchBoardStorageKey));
+} catch(e) {
+    saved = null;
+}
+
+watchBoard = {
+    wanted: ((saved && saved.wanted) || []).map(normalizeWatchEntry).filter(hasWatchContent),
+    banned: ((saved && saved.banned) || []).map(normalizeWatchEntry).filter(hasWatchContent)
+};
+
+renderWatchBoard();
+}
+
+function updateWatchEmptyState(){
+document.getElementById("wantedEmpty").style.display =
+document.getElementById("wantedList").children.length ? "none" : "block";
+document.getElementById("bannedEmpty").style.display =
+document.getElementById("bannedList").children.length ? "none" : "block";
+}
+
 function handleFormChange(){
 saveFormState();
 updateLiveOutput();
@@ -1610,6 +2459,8 @@ try {
 
 if(!saved) {
     restoreGuardName();
+    indivList = [];
+    renderIndivs();
     fillCurrentDateTime();
     updateLiveOutput();
     return;
@@ -1633,8 +2484,8 @@ selectedLawKeys.clear();
 (saved.selectedLawKeys || []).forEach(key => selectedLawKeys.add(key));
 renderLaws();
 
-document.getElementById("indivContainer").innerHTML = "";
-(saved.indivs && saved.indivs.length ? saved.indivs : [{}]).forEach(indiv => addIndiv(indiv));
+indivList = (saved.indivs || []).map(normalizeIndiv).filter(hasIndivContent);
+renderIndivs();
 document.getElementById("otherGuardsContainer").innerHTML = "";
 let restoredGuards = saved.otherGuards || (saved.guardsPresent ? saved.guardsPresent.split("\n").filter(Boolean) : []);
 restoredGuards.forEach(name => addOtherGuard(name));
@@ -1846,8 +2697,8 @@ document.getElementById("customLaw").value = "";
 document.getElementById("lawSearch").value = "";
 selectedLawKeys.clear();
 renderLaws();
-document.getElementById("indivContainer").innerHTML = "";
-addIndiv();
+indivList = [];
+renderIndivs();
 document.getElementById("nom").value = guardName;
 fillCurrentDateTime(true);
 document.getElementById("copyStatus").textContent = "Nouveau rapport prêt.";
@@ -1858,6 +2709,8 @@ handleFormChange();
 
 renderLaws();
 restorePersonalNotes();
+renderServiceMaps();
+initWatchBoardSync();
 restoreFormState();
 bindFormAutosave();
 canSaveForm = true;
