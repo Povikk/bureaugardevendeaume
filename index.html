@@ -1195,8 +1195,7 @@ let watchBoardOnline = false;
 let serviceMapsOnline = false;
 const defaultServiceMaps = [
     {
-        id: "default-patrol",
-        isDefault: true,
+        id: "00000000-0000-0000-0000-000000000001",
         title: "Zones de patrouille",
         description: "Carte de service pour les rondes et secteurs de surveillance.",
         src: "https://i.postimg.cc/VwHzskL4/Copie-de-Copie-de-Copie-de-Sans-titre-38.jpg"
@@ -2303,7 +2302,7 @@ return {
     title: data.title || "Carte sans titre",
     description: data.description || "",
     src: data.src || "",
-    isDefault: !!data.isDefault
+    isFallback: !!data.isFallback
 };
 }
 
@@ -2338,7 +2337,7 @@ if(error){
 }
 
 serviceMapsOnline = true;
-serviceMaps = [...defaultServiceMaps, ...(data || []).map(rowToServiceMap)];
+serviceMaps = (data || []).map(rowToServiceMap);
 renderServiceMaps();
 setMapStatus("Cartes partagées synchronisées.");
 }
@@ -2348,11 +2347,9 @@ const list = document.getElementById("serviceMapList");
 if(!list) return;
 
 list.innerHTML = serviceMaps.map((map, index) => `
-<div class="map-card ${map.isDefault ? "" : "has-actions"}" tabindex="0" onclick="openMapModal(${index})" onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); openMapModal(${index}); }">
-${map.isDefault ? "" : `
+<div class="map-card has-actions" tabindex="0" onclick="openMapModal(${index})" onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); openMapModal(${index}); }">
 <button class="map-remove" type="button" onclick="deleteServiceMap(event, ${index})" title="Supprimer">×</button>
 <button class="map-edit" type="button" onclick="editServiceMap(event, ${index})" title="Modifier">✎</button>
-`}
 <img src="${escapeHtml(map.src)}" alt="${escapeHtml(map.title)}">
 <span>
 <strong>${escapeHtml(map.title)}</strong>
@@ -2379,7 +2376,7 @@ document.getElementById("mapEditorModal").classList.remove("open");
 
 async function saveServiceMap(){
 if(!serviceMapsOnline || !supabaseClient){
-    setMapStatus("Impossible d'ajouter : Supabase n'est pas prêt.");
+    setMapStatus("Impossible d'enregistrer : Supabase n'est pas prêt.");
     return;
 }
 
@@ -2424,15 +2421,20 @@ await loadServiceMapsFromSupabase();
 function editServiceMap(event, index){
 event.stopPropagation();
 const map = serviceMaps[index];
-if(!map || map.isDefault) return;
+if(!map) return;
 openMapEditor(map);
 }
 
 async function deleteServiceMap(event, index){
 event.stopPropagation();
 const map = serviceMaps[index];
-if(!map || map.isDefault) return;
+if(!map) return;
 if(!confirm("Êtes-vous sûr de vouloir supprimer cette carte ?")) return;
+
+if(!serviceMapsOnline || !supabaseClient){
+    setMapStatus("Impossible de supprimer : Supabase n'est pas prêt.");
+    return;
+}
 
 const password = getGuardPassword();
 if(!password){
