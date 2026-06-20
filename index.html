@@ -180,6 +180,10 @@ label {
     margin-bottom:20px;
 }
 
+.button-row {
+    grid-template-columns:1fr 1fr;
+}
+
 .mode-btn {
     background:linear-gradient(#6b4725, var(--wood));
     border:1px solid rgba(45,25,12,0.45);
@@ -189,6 +193,20 @@ label {
 .mode-btn.active {
     background:linear-gradient(#3f2a18, var(--wood-dark));
     outline:2px solid rgba(181,133,53,0.45);
+}
+
+.quick-help {
+    margin:-8px 0 18px;
+    padding:9px 11px;
+    background:rgba(255,252,239,0.42);
+    border:1px solid rgba(70,40,20,0.18);
+    color:rgba(54,35,20,0.78);
+    font-size:12px;
+    line-height:1.35;
+}
+
+.quick-help strong {
+    color:#2d1a0f;
 }
 
 input, textarea, select {
@@ -406,6 +424,37 @@ button:active {
 
 .sentence-card input[type="number"] {
     margin-bottom:0;
+}
+
+.priority-picker {
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:8px;
+    align-items:center;
+}
+
+.priority-dot {
+    width:13px;
+    height:13px;
+    border-radius:50%;
+    border:1px solid rgba(45,25,12,0.42);
+    box-shadow:0 0 0 2px rgba(255,252,239,0.55);
+}
+
+.priority-dot.low {
+    background:#5f9b56;
+}
+
+.priority-dot.medium {
+    background:#c8a742;
+}
+
+.priority-dot.high {
+    background:#c76d35;
+}
+
+.priority-dot.critical {
+    background:#a8322d;
 }
 
 .extra-guards {
@@ -934,6 +983,11 @@ pre {
 <button class="mode-btn" id="m2" onclick="setMode('arrestation')">ARRESTATION</button>
 </div>
 
+<div class="quick-help">
+Remplissez uniquement les cellules utiles ; les champs vides ne s'afficheront pas dans le contenu final.<br>
+Ensuite, utilisez <strong>Copier le titre</strong> pour le coller dans le titre du rapport sur Discord, puis faites la même chose avec <strong>Copier le contenu</strong> pour le contenu.
+</div>
+
 <label>Nom du garde</label>
 <input id="nom" placeholder="Ex : Hrolf Marteau-de-Fer" oninput="saveGuardName(); handleFormChange()">
 <button class="mini-btn" type="button" onclick="addOtherGuard()">+ Autre garde présent</button>
@@ -957,11 +1011,67 @@ pre {
 </div>
 </details>
 
-<details id="rapportBox" class="panel" open>
-<summary>Rapport</summary>
+<details id="rapportMetaBox" class="panel" open>
+<summary>Informations du rapport</summary>
 <div class="panel-body">
-<label>Rapport</label>
-<textarea id="rapport"></textarea>
+<label>Titre court</label>
+<input id="reportTitle" placeholder="Ex : Trouble au marché, ronde des quais, individu suspect...">
+
+<div id="reportTrackingFields">
+<label>Type de rapport</label>
+<select id="reportType">
+<option>Signalement</option>
+<option>Patrouille</option>
+<option>Incident</option>
+<option>Enquête</option>
+<option>Protection</option>
+<option>Surveillance</option>
+</select>
+
+<label>Priorité</label>
+<div class="priority-picker">
+<span class="priority-dot low" id="priorityDot"></span>
+<select id="reportPriority" onchange="updatePriorityDot(); handleFormChange()">
+<option>Basse</option>
+<option>Moyenne</option>
+<option>Haute</option>
+<option>Critique</option>
+</select>
+</div>
+
+<label>Statut</label>
+<select id="reportStatus">
+<option>Signalé</option>
+<option>En cours</option>
+<option>Résolu</option>
+<option>À surveiller</option>
+</select>
+</div>
+
+<label>Grade / fonction</label>
+<select id="reportGrade">
+<option>Garde</option>
+<option>Sergent</option>
+<option>Lieutenant</option>
+<option>Capitaine</option>
+</select>
+
+<div id="reportOnlyFields">
+<label>Résumé</label>
+<textarea id="rapport" placeholder="Décrire brièvement les faits en quelques lignes."></textarea>
+
+<label>Faits confirmés</label>
+<textarea id="confirmedFacts" placeholder="Ce qui est certain : témoignages reçus, constatations, éléments observés..."></textarea>
+
+<label>Informations à vérifier</label>
+<textarea id="verifyInfo" placeholder="Ce qui reste incertain : identité, destination, témoins à revoir, rumeurs..."></textarea>
+
+<label>Mesures prises</label>
+<textarea id="measuresTaken" placeholder="Actions déjà menées : avertissement, escorte, saisie, ronde renforcée..."></textarea>
+
+<label>Suite recommandée</label>
+<textarea id="recommendedNext" placeholder="À faire ensuite : surveiller, interroger, transmettre, classer, convoquer..."></textarea>
+</div>
 </div>
 </details>
 
@@ -990,7 +1100,7 @@ pre {
 <textarea id="customLaw" placeholder="Ex : Article local non listé, refus d'obtempérer, outrage à la garde..."></textarea>
 
 <label>Description des faits</label>
-<textarea id="faits"></textarea>
+<textarea id="faits" placeholder="Ex : individu interpellé après bagarre sur la place du marché, témoins présents, refus d'obtempérer..."></textarea>
 
 <label>Décision / Peine</label>
 <div class="sentence-grid">
@@ -1007,14 +1117,14 @@ pre {
 <input type="number" id="laborHours" min="0" step="1" placeholder="Minutes">
 </div>
 </div>
-<textarea id="decision"></textarea>
+<textarea id="decision" placeholder="Décision libre : avertissement, confiscation, remise à un supérieur, surveillance, travaux particuliers..."></textarea>
 
 </div>
 </details>
 
 <div class="button-row">
-<button onclick="generate()">Générer</button>
-<button onclick="copyReport()">Copier</button>
+<button onclick="copyGeneratedPart('title')">Copier le titre</button>
+<button onclick="copyGeneratedPart('content')">Copier le contenu</button>
 </div>
 <button class="quiet-btn" type="button" onclick="resetForm()">Nouveau rapport</button>
 <div id="copyStatus"></div>
@@ -1076,8 +1186,8 @@ pre {
 </div>
 </details>
 
-<div class="output-title">Texte copiable</div>
-<pre id="output"></pre>
+<pre id="outputTitle" hidden></pre>
+<pre id="output" hidden></pre>
 </div>
 </div>
 
@@ -1112,6 +1222,14 @@ pre {
 <option>Non défini</option>
 </select>
 </div>
+
+<select id="indivModalRole">
+<option>Rôle</option>
+<option>Témoin</option>
+<option>Victime</option>
+<option>Suspect</option>
+<option>Personne à protéger</option>
+</select>
 
 <textarea id="indivModalPhys" placeholder="Description physique (optionnel)"></textarea>
 
@@ -1219,7 +1337,10 @@ mode = m;
 document.getElementById("m1").classList.toggle("active", m==="rapport");
 document.getElementById("m2").classList.toggle("active", m==="arrestation");
 
-document.getElementById("rapportBox").style.display =
+document.getElementById("reportOnlyFields").style.display =
+(m==="rapport") ? "block" : "none";
+
+document.getElementById("reportTrackingFields").style.display =
 (m==="rapport") ? "block" : "none";
 
 document.getElementById("arrestationBox").style.display =
@@ -1233,6 +1354,7 @@ return {
     name: data.name || "",
     race: data.race || "Race",
     sex: data.sex || "Sexe",
+    role: data.role || "Rôle",
     phys: data.phys || ""
 };
 }
@@ -1241,6 +1363,7 @@ function hasIndivContent(indiv){
 return indiv.name.trim() ||
     indiv.race !== "Race" ||
     indiv.sex !== "Sexe" ||
+    indiv.role !== "Rôle" ||
     indiv.phys.trim();
 }
 
@@ -1263,6 +1386,7 @@ indivList.forEach((indiv, index) => {
     let meta = [];
     if(indiv.race && indiv.race !== "Race") meta.push(indiv.race);
     if(indiv.sex && indiv.sex !== "Sexe") meta.push(indiv.sex);
+    if(indiv.role && indiv.role !== "Rôle") meta.push(indiv.role);
     if(indiv.phys) meta.push(indiv.phys);
 
     card.innerHTML = `
@@ -1295,6 +1419,7 @@ document.getElementById("indivModalTitle").textContent =
 document.getElementById("indivModalName").value = indiv.name;
 document.getElementById("indivModalRace").value = indiv.race;
 document.getElementById("indivModalSex").value = indiv.sex;
+document.getElementById("indivModalRole").value = indiv.role;
 document.getElementById("indivModalPhys").value = indiv.phys;
 document.getElementById("indivModal").classList.add("open");
 document.getElementById("indivModalName").focus();
@@ -1311,6 +1436,7 @@ const indiv = normalizeIndiv({
     name: document.getElementById("indivModalName").value,
     race: document.getElementById("indivModalRace").value,
     sex: document.getElementById("indivModalSex").value,
+    role: document.getElementById("indivModalRole").value,
     phys: document.getElementById("indivModalPhys").value
 });
 
@@ -1934,6 +2060,7 @@ let meta = [];
 
 if(i.race && i.race !== "Race") meta.push(i.race);
 if(i.sex && i.sex !== "Sexe") meta.push(i.sex);
+if(i.role && i.role !== "Rôle") meta.push(i.role);
 
 if(meta.length){
 out += ` *(${meta.join(" • ")})*`;
@@ -1944,6 +2071,81 @@ out += ` | *${i.phys}*`;
 }
 
 return out;
+}
+
+function formatReportPerson(i){
+let role = i.role && i.role !== "Rôle" ? i.role : "Rôle non renseigné";
+let out = `• *${role} :* **${i.name || "Individu non identifié"}**`;
+let meta = [];
+
+if(i.race && i.race !== "Race") meta.push(i.race);
+if(i.sex && i.sex !== "Sexe") meta.push(i.sex);
+
+if(meta.length){
+out += ` *(${meta.join(" • ")})*`;
+}
+
+if(i.phys){
+out += ` | *${i.phys}*`;
+}
+
+return out;
+}
+
+function plainReportBlock(value){
+return cleanValue(value, "Non renseigné.");
+}
+
+function priorityClass(value){
+const normalized = (value || "").toLowerCase();
+if(normalized === "moyenne") return "medium";
+if(normalized === "haute") return "high";
+if(normalized === "critique") return "critical";
+return "low";
+}
+
+function priorityBadge(value){
+const normalized = (value || "").toLowerCase();
+if(normalized === "moyenne") return "🟡";
+if(normalized === "haute") return "🟠";
+if(normalized === "critique") return "🔴";
+return "🟢";
+}
+
+function normalizeGrade(value){
+return ["Garde", "Sergent", "Lieutenant", "Capitaine"].includes(value) ? value : "Garde";
+}
+
+function updatePriorityDot(){
+const dot = document.getElementById("priorityDot");
+const field = document.getElementById("reportPriority");
+if(!dot || !field) return;
+dot.className = "priority-dot "+priorityClass(field.value);
+}
+
+function hasText(value){
+return Boolean(value && String(value).trim());
+}
+
+function reportSection(title, content){
+if(!hasText(content)) return "";
+return "### "+title+"\n"+textBlock(String(content).trim())+"\n\n";
+}
+
+function buildReportHeader(typeLabel, title, nom, dateText, lieu, priority, status){
+return "**Auteur :** "+cleanValue(nom, "Non renseigné")+"\n"+
+"**Date :** "+dateText+"\n"+
+"**Lieu :** "+lieu+"\n"+
+"**Priorité :** "+priorityBadge(priority)+" **"+priority+"**\n"+
+"**Statut :** "+status+"\n\n"+
+"---\n\n";
+}
+
+function buildArrestationHeader(title, nom, dateText, lieu){
+return "**Auteur :** "+cleanValue(nom, "Non renseigné")+"\n"+
+"**Date :** "+dateText+"\n"+
+"**Lieu :** "+lieu+"\n\n"+
+"---\n\n";
 }
 
 function cleanValue(value, fallback){
@@ -2108,7 +2310,16 @@ return {
     nom: document.getElementById("nom").value,
     lieu: document.getElementById("lieu").value,
     datetime: document.getElementById("datetime").value,
+    reportType: document.getElementById("reportType").value,
+    reportTitle: document.getElementById("reportTitle").value,
+    reportPriority: document.getElementById("reportPriority").value,
+    reportStatus: document.getElementById("reportStatus").value,
+    reportGrade: document.getElementById("reportGrade").value,
     rapport: document.getElementById("rapport").value,
+    confirmedFacts: document.getElementById("confirmedFacts").value,
+    verifyInfo: document.getElementById("verifyInfo").value,
+    measuresTaken: document.getElementById("measuresTaken").value,
+    recommendedNext: document.getElementById("recommendedNext").value,
     faits: document.getElementById("faits").value,
     otherGuards: getOtherGuards(),
     decision: document.getElementById("decision").value,
@@ -2785,7 +2996,17 @@ restoreGuardName();
 document.getElementById("nom").value = saved.nom || document.getElementById("nom").value;
 document.getElementById("lieu").value = saved.lieu || "";
 document.getElementById("datetime").value = saved.datetime || "";
+document.getElementById("reportType").value = saved.reportType || "Signalement";
+document.getElementById("reportTitle").value = saved.reportTitle || "";
+document.getElementById("reportPriority").value = saved.reportPriority || "Basse";
+updatePriorityDot();
+document.getElementById("reportStatus").value = saved.reportStatus || "Signalé";
+document.getElementById("reportGrade").value = normalizeGrade(saved.reportGrade);
 document.getElementById("rapport").value = saved.rapport || "";
+document.getElementById("confirmedFacts").value = saved.confirmedFacts || "";
+document.getElementById("verifyInfo").value = saved.verifyInfo || "";
+document.getElementById("measuresTaken").value = saved.measuresTaken || "";
+document.getElementById("recommendedNext").value = saved.recommendedNext || "";
 document.getElementById("faits").value = saved.faits || "";
 document.getElementById("decision").value = saved.decision || "";
 document.getElementById("jailHours").value = saved.jailHours || "";
@@ -2811,7 +3032,7 @@ document.getElementById("copyStatus").textContent = "Brouillon local restauré."
 }
 
 function bindFormAutosave(){
-["nom", "lieu", "datetime", "rapport", "faits", "decision", "customLaw", "lawSearch", "jailHours", "fineAmount", "laborHours"].forEach(id => {
+["nom", "lieu", "datetime", "reportType", "reportTitle", "reportPriority", "reportStatus", "reportGrade", "rapport", "confirmedFacts", "verifyInfo", "measuresTaken", "recommendedNext", "faits", "decision", "customLaw", "lawSearch", "jailHours", "fineAmount", "laborHours"].forEach(id => {
     const field = document.getElementById(id);
     field.addEventListener("input", handleFormChange);
     field.addEventListener("change", handleFormChange);
@@ -2927,44 +3148,62 @@ minute:"2-digit"
 let skyrimDate = formatDate(d);
 let skyrimHour = formatSkyrimHour(d);
 let indivs = getIndivs();
-let indiv = indivs.length ? indivs.map(formatIndiv).join("\n") : "• **Aucun individu renseigné**";
-let rapport = cleanValue(document.getElementById("rapport").value, "Aucun rapport renseigné.");
-let faits = cleanValue(document.getElementById("faits").value, "Aucune description renseignée.");
+let indiv = indivs.length ? indivs.map(formatIndiv).join("\n") : "";
+let reportPeople = indivs.length ? indivs.map(formatReportPerson).join("\n\n") : "";
+let reportType = cleanValue(document.getElementById("reportType").value, "Signalement");
+let reportTitle = cleanValue(document.getElementById("reportTitle").value, "Sans titre");
+let reportPriority = cleanValue(document.getElementById("reportPriority").value, "Basse");
+let reportStatus = cleanValue(document.getElementById("reportStatus").value, "Signalé");
+let reportGrade = normalizeGrade(document.getElementById("reportGrade").value);
+let rapport = document.getElementById("rapport").value.trim();
+let confirmedFacts = document.getElementById("confirmedFacts").value.trim();
+let verifyInfo = document.getElementById("verifyInfo").value.trim();
+let measuresTaken = document.getElementById("measuresTaken").value.trim();
+let recommendedNext = document.getElementById("recommendedNext").value.trim();
+let faits = document.getElementById("faits").value.trim();
 let otherGuards = getOtherGuards();
 let otherGuardsText = otherGuards.length ? " *(Autres gardes présents : "+otherGuards.join(", ")+")*" : "";
 let decision = buildDecisionText();
 let selectedLaws = getSelectedLaws();
-let title = mode === "arrestation" ? "ARRESTATION DE LA GARDE" : "RAPPORT DE LA GARDE";
-
-let text =
-"## 📜 "+title+" - VENDEAUME 📜\n\n\n"+
-"Nom du garde : **"+cleanValue(nom, "Non renseigné")+"**"+otherGuardsText+"\n"+
-"Lieu : **"+lieu+"**\n"+
-"Date de Bordeciel : "+skyrimDate+", "+skyrimHour+" ("+realDate+", "+realTime+")\n\n"+
-"### Individus concernés :\n"+quoteLines(indiv)+"\n\n";
+let dateText = skyrimDate+", "+skyrimHour+" ("+realDate+", "+realTime+")";
+let titleText = "";
+let contentText = "";
 
 if(mode==="rapport"){
-text += "### Rapport :\n"+textBlock(rapport);
+titleText = priorityBadge(reportPriority)+" ["+reportType+"] "+reportTitle;
+contentText = buildReportHeader(reportType, reportTitle, nom, dateText, lieu, reportPriority, reportStatus)+
+reportSection("Résumé", rapport)+
+reportSection("Personnes concernées", reportPeople)+
+reportSection("Faits confirmés", confirmedFacts)+
+reportSection("Informations à vérifier", verifyInfo)+
+reportSection("Mesures prises", measuresTaken)+
+reportSection("Suite recommandée", recommendedNext)+
+formatSignature(reportGrade+" "+cleanValue(nom, "Non renseigné"));
 }
 
 if(mode==="arrestation"){
+titleText = "[Arrestation] "+cleanValue(reportTitle, "Arrestation");
+contentText = buildArrestationHeader(cleanValue(reportTitle, "Arrestation"), nom, dateText, lieu)+
+(indiv ? "### Personnes concernées\n"+quoteLines(indiv)+"\n\n" : "");
+
 if(selectedLaws.length){
-    text += "### Articles retenus :\n"+quoteLines(selectedLaws.join("\n"))+"\n\n";
+    contentText += "### Articles retenus :\n"+quoteLines(selectedLaws.join("\n"))+"\n\n";
 }
 
-text += "### Description des faits :\n"+textBlock(faits);
-text += "\n\n### Décision / Peine :\n"+textBlock(decision);
+contentText += reportSection("Faits confirmés", faits);
+contentText += reportSection("Mesures prises", decision);
+contentText += formatSignature(reportGrade+" "+cleanValue(nom, "Non renseigné"));
 }
 
-text += formatSignature(nom);
-
-document.getElementById("output").textContent = text;
-renderDiscordPreview(text);
+const fullText = titleText+"\n\n"+contentText;
+document.getElementById("outputTitle").textContent = titleText;
+document.getElementById("output").textContent = contentText;
+renderDiscordPreview(fullText);
 if(!options.silent){
     document.getElementById("copyStatus").textContent = "";
 }
 saveFormState();
-return text;
+return { title:titleText, content:contentText, full:fullText };
 }
 
 function fallbackCopyText(text){
@@ -2980,17 +3219,25 @@ document.body.removeChild(area);
 return copied;
 }
 
-async function copyReport(){
-const text = generate({ silent:true });
+async function copyTextToClipboard(text){
+if(navigator.clipboard && window.isSecureContext){
+    await navigator.clipboard.writeText(text);
+    return true;
+}
+
+return fallbackCopyText(text);
+}
+
+async function copyGeneratedPart(part){
+const generated = generate({ silent:true });
+const text = part === "title" ? generated.title : generated.content;
+const label = part === "title" ? "Titre" : "Contenu";
 
 try {
-    if(navigator.clipboard && window.isSecureContext){
-        await navigator.clipboard.writeText(text);
-    } else if(!fallbackCopyText(text)){
-        throw new Error("fallback copy failed");
+    if(!text.trim() || !await copyTextToClipboard(text)){
+        throw new Error("copy failed");
     }
-
-    document.getElementById("copyStatus").textContent = "Copié dans le presse-papiers.";
+    document.getElementById("copyStatus").textContent = label+" copié dans le presse-papiers.";
 } catch(e) {
     document.getElementById("copyStatus").textContent = "Copie bloquée par le navigateur. Sélectionne le texte copiable puis Ctrl+C.";
 }
@@ -3000,7 +3247,17 @@ function resetForm(){
 const guardName = document.getElementById("nom").value;
 document.getElementById("lieu").value = "";
 document.getElementById("datetime").value = "";
+document.getElementById("reportType").value = "Signalement";
+document.getElementById("reportTitle").value = "";
+document.getElementById("reportPriority").value = "Basse";
+updatePriorityDot();
+document.getElementById("reportStatus").value = "Signalé";
+document.getElementById("reportGrade").value = "Garde";
 document.getElementById("rapport").value = "";
+document.getElementById("confirmedFacts").value = "";
+document.getElementById("verifyInfo").value = "";
+document.getElementById("measuresTaken").value = "";
+document.getElementById("recommendedNext").value = "";
 document.getElementById("faits").value = "";
 document.getElementById("otherGuardsContainer").innerHTML = "";
 document.getElementById("decision").value = "";
@@ -3028,6 +3285,7 @@ initWatchBoardSync();
 restoreFormState();
 bindFormAutosave();
 canSaveForm = true;
+updatePriorityDot();
 handleFormChange();
 
 </script>
