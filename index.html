@@ -229,6 +229,33 @@ label {
     color:#2d1a0f;
 }
 
+.guard-row,
+.context-row,
+.report-head-row {
+    display:grid;
+    grid-template-columns:minmax(0, 1.5fr) minmax(130px, .7fr);
+    gap:10px;
+    align-items:end;
+}
+
+.report-head-row {
+    grid-template-columns:minmax(0, 1.5fr) minmax(130px, .7fr) minmax(130px, .7fr);
+}
+
+.guard-row label,
+.context-row label,
+.report-head-row label {
+    margin-top:0;
+}
+
+.guard-row input,
+.guard-row select,
+.context-row input,
+.report-head-row input,
+.report-head-row select {
+    margin-bottom:0;
+}
+
 input, textarea, select {
     width:100%;
     padding:10px 11px;
@@ -1024,6 +1051,9 @@ pre {
     .watch-form-row,
     .watch-dialog-actions,
     .watch-summary,
+    .guard-row,
+    .context-row,
+    .report-head-row,
     .mode-bar,
     .button-row,
     .sentence-grid {
@@ -1072,16 +1102,35 @@ Une fois terminé, utilisez <strong>Copier le titre</strong> puis collez-le dans
 <option>Arrestation</option>
 </select>
 
+<div class="guard-row">
+<div>
 <label>Nom du garde</label>
 <input id="nom" placeholder="Ex : Hrolf Marteau-de-Fer" oninput="saveGuardName(); handleFormChange()">
+</div>
+<div>
+<label>Grade</label>
+<select id="reportGrade">
+<option>Garde</option>
+<option>Sergent</option>
+<option>Lieutenant</option>
+<option>Capitaine</option>
+</select>
+</div>
+</div>
+
 <button class="mini-btn" type="button" onclick="addOtherGuard()">+ Autre garde présent</button>
 <div class="extra-guards" id="otherGuardsContainer"></div>
 
+<div class="context-row">
+<div>
 <label>Lieu</label>
 <input id="lieu" placeholder="Ex : Quartier gris, Vendeaume">
-
+</div>
+<div>
 <label>Date et heure des faits</label>
 <input type="datetime-local" id="datetime">
+</div>
+</div>
 
 <details class="panel" open>
 <summary>Individus concernés</summary>
@@ -1098,8 +1147,11 @@ Une fois terminé, utilisez <strong>Copier le titre</strong> puis collez-le dans
 <details id="rapportMetaBox" class="panel" open>
 <summary>Informations du rapport</summary>
 <div class="panel-body">
+<div class="report-head-row">
+<div>
 <label>Titre court</label>
 <input id="reportTitle" placeholder="Ex : Trouble au marché, ronde des quais, individu suspect...">
+</div>
 
 <div id="reportTrackingFields">
 <label>Priorité</label>
@@ -1112,7 +1164,9 @@ Une fois terminé, utilisez <strong>Copier le titre</strong> puis collez-le dans
 <option>Critique</option>
 </select>
 </div>
+</div>
 
+<div id="reportStatusField">
 <label>Statut</label>
 <select id="reportStatus">
 <option>Signalé</option>
@@ -1121,14 +1175,7 @@ Une fois terminé, utilisez <strong>Copier le titre</strong> puis collez-le dans
 <option>À surveiller</option>
 </select>
 </div>
-
-<label>Grade / fonction</label>
-<select id="reportGrade">
-<option>Garde</option>
-<option>Sergent</option>
-<option>Lieutenant</option>
-<option>Capitaine</option>
-</select>
+</div>
 
 <div id="reportOnlyFields">
 <label>Résumé</label>
@@ -1424,6 +1471,9 @@ document.getElementById("reportOnlyFields").style.display =
 (mode==="rapport") ? "block" : "none";
 
 document.getElementById("reportTrackingFields").style.display =
+(mode==="rapport") ? "block" : "none";
+
+document.getElementById("reportStatusField").style.display =
 (mode==="rapport") ? "block" : "none";
 
 document.getElementById("arrestationBox").style.display =
