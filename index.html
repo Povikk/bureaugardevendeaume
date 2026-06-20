@@ -79,6 +79,26 @@ body::after {
     text-align:center;
 }
 
+.law-codex-btn {
+    position:absolute;
+    top:24px;
+    right:30px;
+    width:auto;
+    min-height:0;
+    padding:7px 11px;
+    margin:0;
+    font-size:11px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    opacity:.82;
+    z-index:3;
+}
+
+.law-codex-btn:hover,
+.law-codex-btn:focus {
+    opacity:1;
+}
+
 h2 {
     margin:0;
     font-size:30px;
@@ -844,6 +864,55 @@ pre {
     font-size:18px;
 }
 
+.law-codex-dialog {
+    width:min(860px, 96vw);
+}
+
+.law-codex-head {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:10px;
+}
+
+.law-codex-head h3 {
+    margin-bottom:2px;
+}
+
+.law-codex-head p {
+    margin:0;
+    color:#5e4328;
+    font-size:12px;
+}
+
+.law-codex-head .quiet-btn {
+    width:auto;
+    min-height:0;
+    padding:7px 10px;
+    margin:0;
+}
+
+.law-codex-list {
+    display:grid;
+    gap:8px;
+    max-height:58vh;
+    overflow:auto;
+    padding:4px 4px 4px 0;
+}
+
+.law-codex-item .law-title {
+    align-items:flex-start;
+}
+
+.law-codex-source {
+    display:block;
+    margin-top:3px;
+    color:#745332;
+    font-size:11px;
+    font-weight:normal;
+}
+
 .watch-dialog textarea {
     min-height:66px;
 }
@@ -946,6 +1015,12 @@ pre {
         padding:18px;
     }
 
+    .law-codex-btn {
+        position:static;
+        width:100%;
+        margin-bottom:12px;
+    }
+
     .watch-form-row,
     .watch-dialog-actions,
     .watch-summary,
@@ -970,6 +1045,8 @@ pre {
 
 <div class="container">
 
+<button class="law-codex-btn" type="button" onclick="openLawCodex()">Lois en vigueur</button>
+
 <div class="app-header">
 <h2>📜 BUREAU DE LA GARDE - VENDEAUME 📜</h2>
 <p class="subtitle">Rédaction des rapports, arrestations et actes de service</p>
@@ -978,15 +1055,22 @@ pre {
 <div class="workspace">
 <div class="form-pane">
 
-<div class="mode-bar">
-<button class="mode-btn active" id="m1" onclick="setMode('rapport')">RAPPORT</button>
-<button class="mode-btn" id="m2" onclick="setMode('arrestation')">ARRESTATION</button>
+<div class="quick-help">
+Choisissez le <strong>type de rapport</strong>, puis remplissez seulement les champs utiles : les champs vides ne s'affichent pas.<br>
+Le type <strong>Arrestation</strong> donne accès aux articles sélectionnables.<br>
+Pour Discord, utilisez <strong>Copier le titre</strong>, puis <strong>Copier le contenu</strong>.
 </div>
 
-<div class="quick-help">
-Remplissez uniquement les cellules utiles ; les champs vides ne s'afficheront pas dans le contenu final.<br>
-Ensuite, utilisez <strong>Copier le titre</strong> pour le coller dans le titre du rapport sur Discord, puis faites la même chose avec <strong>Copier le contenu</strong> pour le contenu.
-</div>
+<label>Type de rapport</label>
+<select id="reportType" onchange="syncModeFromReportType()">
+<option>Signalement</option>
+<option>Patrouille</option>
+<option>Incident</option>
+<option>Enquête</option>
+<option>Protection</option>
+<option>Surveillance</option>
+<option>Arrestation</option>
+</select>
 
 <label>Nom du garde</label>
 <input id="nom" placeholder="Ex : Hrolf Marteau-de-Fer" oninput="saveGuardName(); handleFormChange()">
@@ -1018,16 +1102,6 @@ Ensuite, utilisez <strong>Copier le titre</strong> pour le coller dans le titre 
 <input id="reportTitle" placeholder="Ex : Trouble au marché, ronde des quais, individu suspect...">
 
 <div id="reportTrackingFields">
-<label>Type de rapport</label>
-<select id="reportType">
-<option>Signalement</option>
-<option>Patrouille</option>
-<option>Incident</option>
-<option>Enquête</option>
-<option>Protection</option>
-<option>Surveillance</option>
-</select>
-
 <label>Priorité</label>
 <div class="priority-picker">
 <span class="priority-dot low" id="priorityDot"></span>
@@ -1195,6 +1269,20 @@ Ensuite, utilisez <strong>Copier le titre</strong> pour le coller dans le titre 
 
 </div>
 
+<div class="watch-modal" id="lawCodexModal" onclick="closeLawCodex(event)">
+<div class="watch-dialog law-codex-dialog" onclick="event.stopPropagation()">
+<div class="law-codex-head">
+<div>
+<h3>Lois en vigueur</h3>
+<p>Recherche rapide dans les lois locales, arrêtés et lois impériales.</p>
+</div>
+<button class="quiet-btn" type="button" onclick="closeLawCodex()">Fermer</button>
+</div>
+<input id="lawCodexSearch" placeholder="Rechercher un article, un mot-clé, une peine..." oninput="renderLawCodex()">
+<div class="law-codex-list" id="lawCodexList"></div>
+</div>
+</div>
+
 <div class="watch-modal" id="indivModal" onclick="closeIndivModal(event)">
 <div class="watch-dialog" onclick="event.stopPropagation()">
 <h3 id="indivModalTitle">Ajouter un individu</h3>
@@ -1331,21 +1419,35 @@ const defaultServiceMaps = [
 ];
 let serviceMaps = [...defaultServiceMaps];
 
-function setMode(m){
-mode = m;
-
-document.getElementById("m1").classList.toggle("active", m==="rapport");
-document.getElementById("m2").classList.toggle("active", m==="arrestation");
-
+function updateModeVisibility(){
 document.getElementById("reportOnlyFields").style.display =
-(m==="rapport") ? "block" : "none";
+(mode==="rapport") ? "block" : "none";
 
 document.getElementById("reportTrackingFields").style.display =
-(m==="rapport") ? "block" : "none";
+(mode==="rapport") ? "block" : "none";
 
 document.getElementById("arrestationBox").style.display =
-(m==="arrestation") ? "block" : "none";
+(mode==="arrestation") ? "block" : "none";
+}
 
+function syncModeFromReportType(){
+const type = document.getElementById("reportType").value;
+mode = type === "Arrestation" ? "arrestation" : "rapport";
+updateModeVisibility();
+handleFormChange();
+}
+
+function setMode(m){
+mode = m === "arrestation" ? "arrestation" : "rapport";
+const reportTypeField = document.getElementById("reportType");
+if(reportTypeField){
+    if(mode === "arrestation"){
+        reportTypeField.value = "Arrestation";
+    } else if(reportTypeField.value === "Arrestation"){
+        reportTypeField.value = "Signalement";
+    }
+}
+updateModeVisibility();
 handleFormChange();
 }
 
@@ -2250,6 +2352,53 @@ ${content}
 }).join("");
 }
 
+function lawSourceLabel(law){
+if(law.source === "imperial") return "Lois impériales / Bordeciel";
+if(law.source === "extraLocal") return "Arrêtés locaux supplémentaires";
+return "Lois locales - Estemarche / Vendeaume";
+}
+
+function renderLawCodex(){
+const target = document.getElementById("lawCodexList");
+if(!target) return;
+
+const searchField = document.getElementById("lawCodexSearch");
+const search = (searchField ? searchField.value : "").trim().toLowerCase();
+const filtered = allLaws.filter(law => {
+    const haystack = [lawSourceLabel(law), law.category, law.article, law.title, law.text].join(" ").toLowerCase();
+    return !search || haystack.includes(search);
+});
+
+if(!filtered.length){
+    target.innerHTML = '<p class="law-text">Aucune loi trouvée.</p>';
+    return;
+}
+
+target.innerHTML = filtered.map(law => {
+    return `
+<details class="law-item law-codex-item">
+<summary class="law-title">
+<span>${escapeHtml(law.article)} - ${escapeHtml(law.title)}<span class="law-codex-source">${escapeHtml(lawSourceLabel(law))} · ${escapeHtml(law.category)}</span></span>
+</summary>
+<p class="law-text">${escapeHtml(law.text)}</p>
+</details>
+`;
+}).join("");
+}
+
+function openLawCodex(){
+renderLawCodex();
+document.getElementById("lawCodexModal").classList.add("open");
+const searchField = document.getElementById("lawCodexSearch");
+if(searchField) searchField.focus();
+}
+
+function closeLawCodex(event){
+const modal = document.getElementById("lawCodexModal");
+if(event && event.target !== modal) return;
+modal.classList.remove("open");
+}
+
 function renderLaws(){
 const search = document.getElementById("lawSearch").value.trim().toLowerCase();
 const filtered = allLaws.filter(law => {
@@ -2996,7 +3145,7 @@ restoreGuardName();
 document.getElementById("nom").value = saved.nom || document.getElementById("nom").value;
 document.getElementById("lieu").value = saved.lieu || "";
 document.getElementById("datetime").value = saved.datetime || "";
-document.getElementById("reportType").value = saved.reportType || "Signalement";
+document.getElementById("reportType").value = saved.mode === "arrestation" ? "Arrestation" : (saved.reportType || "Signalement");
 document.getElementById("reportTitle").value = saved.reportTitle || "";
 document.getElementById("reportPriority").value = saved.reportPriority || "Basse";
 updatePriorityDot();
@@ -3026,7 +3175,7 @@ let restoredGuards = saved.otherGuards || (saved.guardsPresent ? saved.guardsPre
 restoredGuards.forEach(name => addOtherGuard(name));
 
 isRestoringForm = false;
-setMode(saved.mode || "rapport");
+syncModeFromReportType();
 fillCurrentDateTime();
 document.getElementById("copyStatus").textContent = "Brouillon local restauré.";
 }
