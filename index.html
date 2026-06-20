@@ -129,6 +129,8 @@ h2 {
 .preview-pane {
     position:sticky;
     top:18px;
+    padding-left:22px;
+    border-left:1px solid rgba(70,40,20,0.22);
 }
 
 label {
@@ -502,23 +504,6 @@ button:active {
 
 .priority-dot.critical {
     background:#a8322d;
-}
-
-.extra-guards {
-    display:grid;
-    gap:6px;
-    margin:6px 0 10px;
-}
-
-.extra-guard-row {
-    display:grid;
-    grid-template-columns:1fr 28px;
-    gap:6px;
-    align-items:center;
-}
-
-.extra-guard-row input {
-    margin:0;
 }
 
 .mini-btn {
@@ -1066,6 +1051,8 @@ pre {
 
     .preview-pane {
         position:static;
+        padding-left:0;
+        border-left:none;
     }
 }
 </style>
@@ -1117,9 +1104,6 @@ Une fois terminé, utilisez <strong>Copier le titre</strong> puis collez-le dans
 </select>
 </div>
 </div>
-
-<button class="mini-btn" type="button" onclick="addOtherGuard()">+ Autre garde présent</button>
-<div class="extra-guards" id="otherGuardsContainer"></div>
 
 <div class="context-row">
 <div>
@@ -1619,32 +1603,6 @@ if(!confirm("Êtes-vous sûr de vouloir supprimer l'individu ?")) return;
 indivList.splice(index, 1);
 renderIndivs();
 handleFormChange();
-}
-
-function addOtherGuard(name = ""){
-const container = document.getElementById("otherGuardsContainer");
-const row = document.createElement("div");
-row.className = "extra-guard-row";
-row.innerHTML = `
-<input class="other-guard-name" placeholder="Nom de l'autre garde">
-<button class="remove-mini" type="button" onclick="removeOtherGuard(this)">×</button>
-`;
-
-container.appendChild(row);
-row.querySelector(".other-guard-name").value = name || "";
-row.querySelector(".other-guard-name").addEventListener("input", handleFormChange);
-handleFormChange();
-}
-
-function removeOtherGuard(button){
-button.closest(".extra-guard-row").remove();
-handleFormChange();
-}
-
-function getOtherGuards(){
-return [...document.querySelectorAll(".other-guard-name")]
-    .map(input => input.value.trim())
-    .filter(Boolean);
 }
 
 function getIndivs(){
@@ -2520,7 +2478,6 @@ return {
     measuresTaken: document.getElementById("measuresTaken").value,
     recommendedNext: document.getElementById("recommendedNext").value,
     faits: document.getElementById("faits").value,
-    otherGuards: getOtherGuards(),
     decision: document.getElementById("decision").value,
     jailHours: document.getElementById("jailHours").value,
     fineAmount: document.getElementById("fineAmount").value,
@@ -3220,10 +3177,6 @@ renderLaws();
 
 indivList = (saved.indivs || []).map(normalizeIndiv).filter(hasIndivContent);
 renderIndivs();
-document.getElementById("otherGuardsContainer").innerHTML = "";
-let restoredGuards = saved.otherGuards || (saved.guardsPresent ? saved.guardsPresent.split("\n").filter(Boolean) : []);
-restoredGuards.forEach(name => addOtherGuard(name));
-
 isRestoringForm = false;
 syncModeFromReportType();
 fillCurrentDateTime();
@@ -3360,8 +3313,6 @@ let verifyInfo = document.getElementById("verifyInfo").value.trim();
 let measuresTaken = document.getElementById("measuresTaken").value.trim();
 let recommendedNext = document.getElementById("recommendedNext").value.trim();
 let faits = document.getElementById("faits").value.trim();
-let otherGuards = getOtherGuards();
-let otherGuardsText = otherGuards.length ? " *(Autres gardes présents : "+otherGuards.join(", ")+")*" : "";
 let decision = buildDecisionText();
 let selectedLaws = getSelectedLaws();
 let dateText = skyrimDate+", "+skyrimHour+" ("+realDate+", "+realTime+")";
@@ -3458,7 +3409,6 @@ document.getElementById("verifyInfo").value = "";
 document.getElementById("measuresTaken").value = "";
 document.getElementById("recommendedNext").value = "";
 document.getElementById("faits").value = "";
-document.getElementById("otherGuardsContainer").innerHTML = "";
 document.getElementById("decision").value = "";
 document.getElementById("jailHours").value = "";
 document.getElementById("fineAmount").value = "";
