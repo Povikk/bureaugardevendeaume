@@ -1386,6 +1386,7 @@ Une fois terminé, utilisez <strong>Copier le titre</strong> puis collez-le dans
 <h3 id="watchModalTitle">Ajouter une personne</h3>
 <input type="hidden" id="watchModalType">
 <input type="hidden" id="watchModalIndex">
+<input type="hidden" id="watchModalId">
 
 <div class="watch-form-row">
 <input id="watchModalName" placeholder="Nom">
@@ -3009,6 +3010,7 @@ function openWatchModal(type, index = ""){
 const item = index === "" ? normalizeWatchEntry() : normalizeWatchEntry(watchBoard[type][index]);
 document.getElementById("watchModalType").value = type;
 document.getElementById("watchModalIndex").value = index;
+document.getElementById("watchModalId").value = item.id || "";
 document.getElementById("watchModalTitle").textContent =
     (index === "" ? "Ajouter une " : "Modifier une ")+getWatchLabel(type);
 document.getElementById("watchModalName").value = item.name;
@@ -3031,7 +3033,9 @@ document.getElementById("watchModal").classList.remove("open");
 async function saveWatchModal(){
 const type = document.getElementById("watchModalType").value;
 const index = document.getElementById("watchModalIndex").value;
+const currentId = document.getElementById("watchModalId").value;
 const item = normalizeWatchEntry({
+    id: currentId,
     name: document.getElementById("watchModalName").value,
     race: document.getElementById("watchModalRace").value,
     sex: document.getElementById("watchModalSex").value,
@@ -3047,17 +3051,21 @@ if(!hasWatchContent(item)){
     return;
 }
 
-if(index !== ""){
+if(!item.id && index !== "" && watchBoard[type][Number(index)]){
     item.id = watchBoard[type][Number(index)].id || "";
 }
 
 const syncedItem = await syncWatchNotice(type, item);
 if(!syncedItem) return;
 
-if(index === ""){
+const existingIndex = syncedItem.id
+    ? watchBoard[type].findIndex(entry => entry.id === syncedItem.id)
+    : (index === "" ? -1 : Number(index));
+
+if(existingIndex < 0 || Number.isNaN(existingIndex)){
     watchBoard[type].push(syncedItem);
 } else {
-    watchBoard[type][Number(index)] = syncedItem;
+    watchBoard[type][existingIndex] = syncedItem;
 }
 
 saveWatchBoardCache();
@@ -3441,6 +3449,3 @@ handleFormChange();
 
 </body>
 </html>
-
-
-
