@@ -2204,7 +2204,7 @@ return out;
 
 function formatReportPerson(i){
 let role = i.role && i.role !== "Rôle" ? i.role : "Rôle non renseigné";
-let out = `• *${role} :* **${i.name || "Individu non identifié"}**`;
+let out = `• *${role}* : **${i.name || "Individu non identifié"}**`;
 let meta = [];
 
 if(i.race && i.race !== "Race") meta.push(i.race);
