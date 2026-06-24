@@ -3805,10 +3805,24 @@ const wrapper = document.querySelector(".zone-map-canvas-wrap");
 if(!canvas || !wrapper) return { x:0, y:0, w:canvas.width, h:canvas.height };
 
 const scale = Math.max(0.1, zoneMapZoom);
-const x = Math.max(0, wrapper.scrollLeft / scale);
-const y = Math.max(0, wrapper.scrollTop / scale);
-const w = Math.min(canvas.width - x, wrapper.clientWidth / scale);
-const h = Math.min(canvas.height - y, wrapper.clientHeight / scale);
+const visibleX = Math.max(0, wrapper.scrollLeft / scale);
+const visibleY = Math.max(0, wrapper.scrollTop / scale);
+const visibleW = Math.min(canvas.width - visibleX, wrapper.clientWidth / scale);
+const visibleH = Math.min(canvas.height - visibleY, wrapper.clientHeight / scale);
+const outputRatio = 16 / 9;
+let w = visibleW;
+let h = visibleH;
+
+if(w / h > outputRatio){
+    w = h * outputRatio;
+} else {
+    h = w / outputRatio;
+}
+
+let x = visibleX + (visibleW - w) / 2;
+let y = visibleY + (visibleH - h) / 2;
+x = Math.max(0, Math.min(canvas.width - w, x));
+y = Math.max(0, Math.min(canvas.height - h, y));
 
 return {
     x: Math.round(x),
@@ -3975,10 +3989,11 @@ if(!visibleShapes.length){
 }
 
 const outCanvas = document.createElement("canvas");
-const maxOutputSize = 1600;
-const outputScale = Math.min(1, maxOutputSize / Math.max(outputRect.w, outputRect.h));
-outCanvas.width = Math.max(1, Math.round(outputRect.w * outputScale));
-outCanvas.height = Math.max(1, Math.round(outputRect.h * outputScale));
+const outputWidth = 1600;
+const outputHeight = 900;
+const outputScale = outputWidth / outputRect.w;
+outCanvas.width = outputWidth;
+outCanvas.height = outputHeight;
 const outCtx = outCanvas.getContext("2d");
 outCtx.drawImage(
     zoneMapImage,
