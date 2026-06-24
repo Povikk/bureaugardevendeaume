@@ -1131,20 +1131,23 @@ pre {
 }
 
 .zone-map-preview {
-    display:none;
-    margin-top:10px;
-    padding-top:10px;
-    border-top:1px solid rgba(70,40,20,0.20);
+    width:min(1100px, 96vw);
 }
 
 .zone-map-preview img {
     width:100%;
-    max-height:220px;
+    max-height:70vh;
     object-fit:contain;
     display:block;
-    margin-top:6px;
+    margin:8px 0 10px;
     border:1px solid rgba(70,40,20,0.28);
     background:rgba(255,252,239,0.36);
+}
+
+.zone-preview-actions {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
 }
 
 .map-dialog img {
@@ -1573,7 +1576,7 @@ Une fois terminé, utilisez <strong>Copier le titre</strong> puis collez-le dans
 <div class="watch-modal" id="zoneMapModal" onclick="closeZoneMap(event)">
 <div class="watch-dialog zone-map-dialog" onclick="event.stopPropagation()">
 <h3>Marquer le lieu sur la carte</h3>
-<p class="watch-status">L'image générée prendra ce qui est visible à l'écran. Utilisez les outils pour marquer une zone, une route ou un cercle de patrouille.</p>
+<p class="watch-status">L'image générée prendra ce qui est visible à l'écran. Utilisez les outils pour marquer une zone, une route ou une présence de garde.</p>
 <div class="zone-map-workspace">
 <div class="zone-map-toolbar">
 <button class="quiet-btn active" id="zoneToolIncident" type="button" onclick="setZoneMapTool('incident')" title="Zone de l'incident">Zone</button>
@@ -1599,10 +1602,16 @@ Une fois terminé, utilisez <strong>Copier le titre</strong> puis collez-le dans
 <button class="quiet-btn" type="button" onclick="clearZoneMapSelection()">Effacer</button>
 <button class="quiet-btn" type="button" onclick="closeZoneMap()">Fermer</button>
 </div>
-<div class="zone-map-preview" id="zoneMapPreviewBox">
-<strong>Aperçu généré</strong>
+</div>
+</div>
+
+<div class="watch-modal" id="zoneMapPreviewModal" onclick="closeZoneMapPreview(event)">
+<div class="watch-dialog zone-map-preview" onclick="event.stopPropagation()">
+<h3>Aperçu de la carte générée</h3>
 <img id="zoneMapPreview" alt="Carte annotée">
+<div class="zone-preview-actions">
 <a id="zoneMapDownload" class="quiet-btn" download="lieu-marque-vendeaume.jpg">Télécharger l'image</a>
+<button class="quiet-btn" type="button" onclick="closeZoneMapPreview()">Fermer</button>
 </div>
 </div>
 </div>
@@ -3977,6 +3986,12 @@ if(event && event.target !== modal) return;
 modal.classList.remove("open");
 }
 
+function closeZoneMapPreview(event){
+const modal = document.getElementById("zoneMapPreviewModal");
+if(event && event.target !== modal) return;
+modal.classList.remove("open");
+}
+
 function generateZoneMapImage(){
 const canvas = document.getElementById("zoneMapCanvas");
 if(!zoneMapShapes.length){
@@ -4012,7 +4027,7 @@ drawZoneMap();
 const dataUrl = outCanvas.toDataURL("image/jpeg", 0.82);
 document.getElementById("zoneMapPreview").src = dataUrl;
 document.getElementById("zoneMapDownload").href = dataUrl;
-document.getElementById("zoneMapPreviewBox").style.display = "block";
+document.getElementById("zoneMapPreviewModal").classList.add("open");
 document.getElementById("locationMapStatus").textContent = "Image visible prête.";
 }
 
@@ -4021,7 +4036,7 @@ zoneMapShapes = [];
 zoneMapDraft = null;
 zoneMapDragStart = null;
 drawZoneMap();
-document.getElementById("zoneMapPreviewBox").style.display = "none";
+document.getElementById("zoneMapPreviewModal").classList.remove("open");
 document.getElementById("zoneMapPreview").removeAttribute("src");
 document.getElementById("zoneMapDownload").removeAttribute("href");
 document.getElementById("locationMapStatus").textContent = "Zone effacée.";
