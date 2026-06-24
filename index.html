@@ -1391,6 +1391,10 @@ Une fois terminé, utilisez <strong>Copier le titre</strong> puis collez-le dans
 <summary>Arrêtés locaux supplémentaires</summary>
 <div class="law-list" id="extraLocalLawList"></div>
 </details>
+<details class="law-panel">
+<summary>Pactes et accords de châtelleries</summary>
+<div class="law-list" id="treatyLawList"></div>
+</details>
 <div class="selected-laws" id="selectedLawsSummary"></div>
 
 <label>Article ou motif personnalisé</label>
@@ -1497,7 +1501,7 @@ Une fois terminé, utilisez <strong>Copier le titre</strong> puis collez-le dans
 <div class="law-codex-head">
 <div>
 <h3>Lois en vigueur</h3>
-<p>Recherche rapide dans les lois locales, arrêtés et lois impériales.</p>
+<p>Recherche rapide dans les lois locales, arrêtés, pactes et lois impériales.</p>
 </div>
 <button class="quiet-btn" type="button" onclick="closeLawCodex()">Fermer</button>
 </div>
@@ -2355,6 +2359,38 @@ const imperialLaws = [
     }
 ]
 ;
+const treatyLaws = [
+    {
+        article:"Article Premier",
+        title:"Reconnaissance mutuelle",
+        text:"Les Châtelleries d'Estemarche et de la Brèche se reconnaissent mutuellement comme entités souveraines, libres et indépendantes. Chacune s'engage à respecter l'intégrité de ses frontières, l'autorité de ses institutions et les droits de ses dirigeants sur leurs terres et leurs sujets."
+    },
+    {
+        article:"Article II",
+        title:"Défense mutuelle",
+        text:"Toute agression armée, invasion ou menace militaire visant l'une des deux Châtelleries est considérée comme une atteinte à la sécurité commune. Les deux parties s'engagent alors à se porter assistance selon leurs moyens, par l'envoi de troupes, de ravitaillement, de renseignements ou de tout autre soutien nécessaire à la préservation de la paix et de la souveraineté du territoire menacé."
+    },
+    {
+        article:"Article III",
+        title:"Coopération des gardes frontaliers",
+        text:"Les gardes d'Estemarche et de la Brèche maintiennent une coopération régulière sur les territoires frontaliers communs. Ils peuvent échanger renseignements, signalements et informations relatives aux menaces pesant sur la sécurité des voyageurs, marchands et habitants des régions limitrophes. Des patrouilles coordonnées peuvent être organisées lorsque les autorités des deux Châtelleries le jugent nécessaire."
+    },
+    {
+        article:"Article IV",
+        title:"Criminels et fugitifs",
+        text:"Les avis de recherche émis par l'une des Châtelleries sont transmis aux autorités de l'autre dans les meilleurs délais. Tout individu recherché pour crime, brigandage, meurtre, trahison ou autre délit grave et appréhendé sur le territoire de l'une des parties peut être remis aux autorités compétentes de la Châtellerie requérante. La restitution des fugitifs s'effectue sous bonne garde aux portes de la ville ou du fort désigné, après vérification de leur identité et des motifs de leur recherche."
+    },
+    {
+        article:"Article V",
+        title:"Non-ingérence",
+        text:"Aucune des parties ne peut intervenir dans les affaires intérieures, judiciaires, militaires ou administratives de l'autre sans invitation ou consentement explicite. Le présent pacte ne saurait être interprété comme une soumission de l'une des Châtelleries à l'autre, mais comme une alliance entre puissances souveraines et égales."
+    },
+    {
+        article:"Article VI",
+        title:"Garantie des souverainetés",
+        text:"Les signataires garantissent mutuellement la souveraineté, l'intégrité territoriale et les droits légitimes de gouvernance de chacune des Châtelleries. Toute tentative visant à remettre en cause l'existence, l'indépendance ou les frontières reconnues de l'une des parties est considérée comme contraire à l'esprit du présent pacte."
+    }
+].map(law => ({...law, source:"treaty", category:"Pacte de Défense et de Coopération entre les Châtelleries d'Estemarche et de la Brèche"}));
 const allLaws = [
     ...localLaws.map(law => ({...law, source:"local", category:"Lois locales - Estemarche / Vendeaume"})),
     ...[
@@ -2374,6 +2410,7 @@ const allLaws = [
             text:"Tout affichage sans autorisation préalable de la Cour de Vendeaume ou d'un haut-gradé de la garde est considéré comme sauvage et entraîne une amende de 1000 septims. S'il est jugé dangereux pour l'intégrité ou la paix de la châtellerie au regard des réglementations impériales, il est considéré comme illégal et entraîne une amende de 4000 septims. Des sanctions plus lourdes peuvent être appliquées en cas de récidive ou de menace réelle."
         }
     ].map(law => ({...law, source:"extraLocal", category:"Arrêtés locaux supplémentaires"})),
+    ...treatyLaws,
     ...imperialLaws
 ];
 const selectedLawKeys = new Set();
@@ -2575,7 +2612,7 @@ if(!lawsToRender.length){
 target.innerHTML = lawsToRender.slice(0, 8).map(law => {
     const key = lawKey(law);
     const checked = selectedLawKeys.has(key) ? "checked" : "";
-    const source = law.source === "imperial" ? "Loi impériale / Bordeciel" : law.source === "extraLocal" ? "Arrêté local" : "Loi locale";
+    const source = law.source === "imperial" ? "Loi impériale / Bordeciel" : law.source === "extraLocal" ? "Arrêté local" : law.source === "treaty" ? "Pacte de châtelleries" : "Loi locale";
     const isLong = law.text.length > 150;
     const excerpt = isLong ? law.text.slice(0, 150)+"..." : law.text;
     const content = isLong ? `
@@ -2608,6 +2645,7 @@ ${content}
 function lawSourceLabel(law){
 if(law.source === "imperial") return "Lois impériales / Bordeciel";
 if(law.source === "extraLocal") return "Arrêtés locaux supplémentaires";
+if(law.source === "treaty") return "Pactes et accords de châtelleries";
 return "Lois locales - Estemarche / Vendeaume";
 }
 
@@ -2663,6 +2701,7 @@ renderLawSearchResults(filtered, search);
 renderLawGroup("localLawList", filtered.filter(law => law.source === "local"));
 renderLawGroup("imperialLawList", filtered.filter(law => law.source === "imperial"));
 renderLawGroup("extraLocalLawList", filtered.filter(law => law.source === "extraLocal"));
+renderLawGroup("treatyLawList", filtered.filter(law => law.source === "treaty"));
 renderSelectedLawsSummary();
 updateLiveOutput();
 }
@@ -2694,7 +2733,7 @@ summary.innerHTML =
 
 function getSelectedLaws(){
 let selected = allLaws.filter(law => selectedLawKeys.has(lawKey(law))).map(law => {
-    const source = law.source === "imperial" ? "Loi impériale" : law.source === "extraLocal" ? "Arrêté local" : "Loi locale";
+    const source = law.source === "imperial" ? "Loi impériale" : law.source === "extraLocal" ? "Arrêté local" : law.source === "treaty" ? "Pacte" : "Loi locale";
     return "• **"+source+" - "+law.article+" - "+law.title+"**";
 });
 let customLaw = document.getElementById("customLaw").value.trim();
