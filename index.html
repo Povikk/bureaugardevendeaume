@@ -79,10 +79,21 @@ body::after {
     text-align:center;
 }
 
-.law-codex-btn {
+.top-tool-buttons {
     position:absolute;
     top:24px;
+    left:30px;
+    display:flex;
+    gap:8px;
+    z-index:3;
+}
+
+.top-tool-buttons.right {
+    left:auto;
     right:30px;
+}
+
+.law-codex-btn {
     width:auto;
     min-height:0;
     padding:7px 11px;
@@ -91,7 +102,6 @@ body::after {
     letter-spacing:.04em;
     text-transform:uppercase;
     opacity:.82;
-    z-index:3;
 }
 
 .law-codex-btn:hover,
@@ -258,6 +268,39 @@ label {
     margin-bottom:0;
 }
 
+.location-tools {
+    position:relative;
+    margin:6px 0 0;
+}
+
+.location-map-btn {
+    position:absolute;
+    right:6px;
+    top:50%;
+    transform:translateY(-50%);
+    width:28px;
+    height:28px;
+    min-height:28px;
+    padding:0;
+    margin:0;
+    line-height:26px;
+    font-size:15px;
+}
+
+.location-tools input {
+    margin:0;
+    padding-right:44px;
+}
+
+.location-status {
+    display:block;
+    min-height:14px;
+    margin-top:3px;
+    color:rgba(63,42,24,0.62);
+    font-size:11px;
+    font-style:italic;
+}
+
 input, textarea, select {
     width:100%;
     padding:10px 11px;
@@ -300,6 +343,19 @@ button:focus {
 
 button:active {
     transform:translateY(1px);
+}
+
+a.quiet-btn {
+    display:block;
+    width:100%;
+    padding:10px;
+    margin-top:8px;
+    color:#f5e6c8;
+    border:1px solid rgba(45,25,12,0.42);
+    font-weight:bold;
+    text-align:center;
+    text-decoration:none;
+    box-sizing:border-box;
 }
 
 .quiet-btn {
@@ -1004,6 +1060,90 @@ pre {
     width:min(940px, 96vw);
 }
 
+.zone-map-dialog {
+    width:min(980px, 96vw);
+}
+
+.zone-map-workspace {
+    display:grid;
+    grid-template-columns:64px 1fr;
+    gap:10px;
+    align-items:start;
+}
+
+.zone-map-toolbar {
+    display:grid;
+    gap:7px;
+    position:sticky;
+    top:0;
+}
+
+.zone-map-toolbar button {
+    width:100%;
+    min-height:34px;
+    padding:6px;
+    margin:0;
+    font-size:11px;
+}
+
+.zone-map-toolbar button.active {
+    outline:2px solid rgba(157,35,27,0.55);
+    background:linear-gradient(#4b3019, #3b2414);
+}
+
+.zone-color-row {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px;
+}
+
+.zone-color-btn {
+    min-height:24px !important;
+    padding:0 !important;
+    border:1px solid rgba(45,25,12,0.55);
+}
+
+.zone-color-btn.active {
+    outline:2px solid rgba(245,230,200,0.82) !important;
+}
+
+.zone-map-canvas-wrap {
+    overflow:auto;
+    max-height:62vh;
+    border:1px solid rgba(70,40,20,0.34);
+    background:rgba(42,25,13,0.24);
+}
+
+.zone-map-actions {
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:8px;
+    margin:10px 0;
+}
+
+#zoneMapCanvas {
+    display:block;
+    height:auto;
+    cursor:crosshair;
+}
+
+.zone-map-preview {
+    display:none;
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid rgba(70,40,20,0.20);
+}
+
+.zone-map-preview img {
+    width:100%;
+    max-height:220px;
+    object-fit:contain;
+    display:block;
+    margin-top:6px;
+    border:1px solid rgba(70,40,20,0.28);
+    background:rgba(255,252,239,0.36);
+}
+
 .map-dialog img {
     width:100%;
     max-height:78vh;
@@ -1045,10 +1185,19 @@ pre {
         padding:18px;
     }
 
-    .law-codex-btn {
+    .top-tool-buttons {
         position:static;
-        width:100%;
+        display:block;
+        gap:8px;
         margin-bottom:12px;
+    }
+
+    .top-tool-buttons.right {
+        position:static;
+    }
+
+    .law-codex-btn {
+        width:100%;
     }
 
     .watch-form-row,
@@ -1059,8 +1208,18 @@ pre {
     .report-head-row,
     .mode-bar,
     .button-row,
+    .zone-map-actions,
     .sentence-grid {
         grid-template-columns:1fr;
+    }
+
+    .zone-map-workspace {
+        grid-template-columns:1fr;
+    }
+
+    .zone-map-toolbar {
+        grid-template-columns:repeat(4, 1fr);
+        position:static;
     }
 
     .workspace {
@@ -1080,7 +1239,12 @@ pre {
 
 <div class="container">
 
+<div class="top-tool-buttons">
+<button class="law-codex-btn" type="button" onclick="openZoneMap()">Cartographie</button>
+</div>
+<div class="top-tool-buttons right">
 <button class="law-codex-btn" type="button" onclick="openLawCodex()">Lois en vigueur</button>
+</div>
 
 <div class="app-header">
 <h2>📜 BUREAU DE LA GARDE - VENDEAUME 📜</h2>
@@ -1126,13 +1290,17 @@ Une fois terminé, utilisez <strong>Copier le titre</strong> puis collez-le dans
 <div class="context-row">
 <div>
 <label>Lieu</label>
+<div class="location-tools">
 <input id="lieu" placeholder="Ex : Quartier gris, Vendeaume">
+<button class="watch-add location-map-btn" type="button" onclick="openZoneMap()" title="Marquer sur carte">⌖</button>
+</div>
 </div>
 <div>
 <label>Date et heure</label>
 <input type="datetime-local" id="datetime">
 </div>
 </div>
+<span class="location-status" id="locationMapStatus"></span>
 
 <details class="panel" open>
 <summary>Individus concernés</summary>
@@ -1399,6 +1567,43 @@ Une fois terminé, utilisez <strong>Copier le titre</strong> puis collez-le dans
 </div>
 </div>
 
+<div class="watch-modal" id="zoneMapModal" onclick="closeZoneMap(event)">
+<div class="watch-dialog zone-map-dialog" onclick="event.stopPropagation()">
+<h3>Marquer le lieu sur la carte</h3>
+<p class="watch-status">L'image générée prendra ce qui est visible à l'écran. Utilisez les outils pour marquer une zone, une route ou un cercle de patrouille.</p>
+<div class="zone-map-workspace">
+<div class="zone-map-toolbar">
+<button class="quiet-btn active" id="zoneToolIncident" type="button" onclick="setZoneMapTool('incident')" title="Zone de l'incident">Zone</button>
+<button class="quiet-btn" id="zoneToolLine" type="button" onclick="setZoneMapTool('line')" title="Ligne ou chemin de patrouille">Ligne</button>
+<button class="quiet-btn" id="zoneToolShield" type="button" onclick="setZoneMapTool('shield')" title="Poste gardé / présence de la garde">Bouclier</button>
+<button class="quiet-btn" id="zoneToolErase" type="button" onclick="setZoneMapTool('erase')" title="Supprimer un marquage">Suppr.</button>
+<div class="zone-color-row">
+<button class="zone-color-btn active" id="zoneColorRed" type="button" onclick="setZoneMapColor('red')" style="background:#9d231b" title="Rouge"></button>
+<button class="zone-color-btn" id="zoneColorGold" type="button" onclick="setZoneMapColor('gold')" style="background:#c6943f" title="Or"></button>
+<button class="zone-color-btn" id="zoneColorBlue" type="button" onclick="setZoneMapColor('blue')" style="background:#2e5f82" title="Bleu"></button>
+<button class="zone-color-btn" id="zoneColorGreen" type="button" onclick="setZoneMapColor('green')" style="background:#557a3d" title="Vert"></button>
+</div>
+<button class="quiet-btn" type="button" onclick="setZoneMapZoom(-0.08)" title="Dézoomer">-</button>
+<button class="quiet-btn" type="button" onclick="setZoneMapZoom(0.08)" title="Zoomer">+</button>
+<button class="quiet-btn" type="button" onclick="resetZoneMapZoom()" title="Vue complète">Vue</button>
+</div>
+<div class="zone-map-canvas-wrap">
+<canvas id="zoneMapCanvas"></canvas>
+</div>
+</div>
+<div class="zone-map-actions">
+<button type="button" onclick="generateZoneMapImage()">Générer l'image</button>
+<button class="quiet-btn" type="button" onclick="clearZoneMapSelection()">Effacer</button>
+<button class="quiet-btn" type="button" onclick="closeZoneMap()">Fermer</button>
+</div>
+<div class="zone-map-preview" id="zoneMapPreviewBox">
+<strong>Aperçu généré</strong>
+<img id="zoneMapPreview" alt="Carte annotée">
+<a id="zoneMapDownload" class="quiet-btn" download="lieu-marque-vendeaume.jpg">Télécharger l'image</a>
+</div>
+</div>
+</div>
+
 <div class="watch-modal" id="watchModal" onclick="closeWatchModal(event)">
 <div class="watch-dialog" onclick="event.stopPropagation()">
 <h3 id="watchModalTitle">Ajouter une personne</h3>
@@ -1459,6 +1664,15 @@ let indivList = [];
 let supabaseClient = null;
 let watchBoardOnline = false;
 let serviceMapsOnline = false;
+const zoneMapSrc = "assets/eastmarch-map.jpg";
+let zoneMapImage = null;
+let zoneMapShapes = [];
+let zoneMapDraft = null;
+let zoneMapDragStart = null;
+let zoneMapPanStart = null;
+let zoneMapZoom = 1;
+let zoneMapTool = "incident";
+let zoneMapColor = "red";
 const defaultServiceMaps = [
     {
         id: "00000000-0000-0000-0000-000000000001",
@@ -3304,6 +3518,495 @@ preview.innerHTML = text.split("\n").map(line => {
 
     return "<div class=\"preview-line\">"+formatInlineMarkdown(line)+"</div>";
 }).join("");
+}
+
+function getZoneMapCanvasPoint(event){
+const canvas = document.getElementById("zoneMapCanvas");
+const rect = canvas.getBoundingClientRect();
+return {
+    x: Math.max(0, Math.min(canvas.width, (event.clientX - rect.left) * (canvas.width / rect.width))),
+    y: Math.max(0, Math.min(canvas.height, (event.clientY - rect.top) * (canvas.height / rect.height)))
+};
+}
+
+function drawZoneMap(){
+const canvas = document.getElementById("zoneMapCanvas");
+if(!canvas || !zoneMapImage) return;
+const ctx = canvas.getContext("2d");
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+ctx.drawImage(zoneMapImage, 0, 0, canvas.width, canvas.height);
+
+zoneMapShapes.forEach(shape => drawZoneShape(ctx, shape, zoneMapZoom));
+if(zoneMapDraft) drawZoneShape(ctx, zoneMapDraft, zoneMapZoom);
+}
+
+function buildZoneShape(start, end, type = zoneMapTool){
+let x = Math.min(start.x, end.x);
+let y = Math.min(start.y, end.y);
+let w = Math.abs(end.x - start.x);
+let h = Math.abs(end.y - start.y);
+if(type === "incident"){
+    const size = Math.max(w, h);
+    x = end.x < start.x ? start.x - size : start.x;
+    y = end.y < start.y ? start.y - size : start.y;
+    w = size;
+    h = size;
+}
+return {
+    type,
+    color:zoneMapColor,
+    x,
+    y,
+    w,
+    h,
+    x1:start.x,
+    y1:start.y,
+    x2:end.x,
+    y2:end.y
+};
+}
+
+function isDrawableZoneShape(shape){
+if(!shape) return false;
+if(shape.type === "shield") return true;
+if(shape.type === "line"){
+    return Math.hypot(shape.x2 - shape.x1, shape.y2 - shape.y1) > 6;
+}
+return shape.w > 6 && shape.h > 6;
+}
+
+function zoneShapeIntersectsRect(shape, rect){
+if(shape.type === "shield"){
+    return shape.x1 >= rect.x &&
+        shape.x1 <= rect.x + rect.w &&
+        shape.y1 >= rect.y &&
+        shape.y1 <= rect.y + rect.h;
+}
+return !(
+    shape.x + shape.w < rect.x ||
+    shape.y + shape.h < rect.y ||
+    shape.x > rect.x + rect.w ||
+    shape.y > rect.y + rect.h
+);
+}
+
+function pointDistanceToSegment(point, a, b){
+const dx = b.x - a.x;
+const dy = b.y - a.y;
+if(dx === 0 && dy === 0) return Math.hypot(point.x - a.x, point.y - a.y);
+const t = Math.max(0, Math.min(1, ((point.x - a.x) * dx + (point.y - a.y) * dy) / (dx * dx + dy * dy)));
+const x = a.x + t * dx;
+const y = a.y + t * dy;
+return Math.hypot(point.x - x, point.y - y);
+}
+
+function zoneShapeContainsPoint(shape, point){
+const tolerance = 18 / Math.max(0.1, zoneMapZoom);
+if(shape.type === "line"){
+    return pointDistanceToSegment(point, { x:shape.x1, y:shape.y1 }, { x:shape.x2, y:shape.y2 }) <= tolerance;
+}
+if(shape.type === "shield"){
+    return Math.hypot(point.x - shape.x1, point.y - shape.y1) <= 34 / Math.max(0.1, zoneMapZoom);
+}
+if(shape.type === "incident"){
+    const rx = shape.w / 2;
+    const ry = shape.h / 2;
+    if(rx <= 0 || ry <= 0) return false;
+    const cx = shape.x + rx;
+    const cy = shape.y + ry;
+    const value = ((point.x - cx) ** 2) / (rx ** 2) + ((point.y - cy) ** 2) / (ry ** 2);
+    return value <= 1.12;
+}
+return point.x >= shape.x - tolerance &&
+    point.x <= shape.x + shape.w + tolerance &&
+    point.y >= shape.y - tolerance &&
+    point.y <= shape.y + shape.h + tolerance;
+}
+
+function eraseZoneShapeAt(point){
+for(let i = zoneMapShapes.length - 1; i >= 0; i--){
+    if(zoneShapeContainsPoint(zoneMapShapes[i], point)){
+        zoneMapShapes.splice(i, 1);
+        drawZoneMap();
+        document.getElementById("locationMapStatus").textContent = "Marquage supprimé.";
+        return true;
+    }
+}
+document.getElementById("locationMapStatus").textContent = "Aucun marquage ici.";
+return false;
+}
+
+function shiftZoneShape(shape, rect, scale){
+return {
+    ...shape,
+    x:(shape.x - rect.x) * scale,
+    y:(shape.y - rect.y) * scale,
+    w:shape.w * scale,
+    h:shape.h * scale,
+    x1:(shape.x1 - rect.x) * scale,
+    y1:(shape.y1 - rect.y) * scale,
+    x2:(shape.x2 - rect.x) * scale,
+    y2:(shape.y2 - rect.y) * scale
+};
+}
+
+function getZoneColor(color){
+const palette = {
+    red:{ main:"157, 35, 27", dark:"88, 18, 14", fill:"132, 24, 18", light:"255, 214, 130" },
+    gold:{ main:"198, 148, 63", dark:"92, 62, 22", fill:"160, 105, 30", light:"255, 226, 142" },
+    blue:{ main:"46, 95, 130", dark:"18, 47, 70", fill:"32, 74, 106", light:"151, 204, 232" },
+    green:{ main:"85, 122, 61", dark:"35, 65, 30", fill:"72, 104, 52", light:"183, 220, 150" }
+};
+return palette[color] || palette.red;
+}
+
+function drawMedievalRect(ctx, shape, scale){
+const rect = shape;
+const color = getZoneColor(shape.color);
+ctx.fillStyle = "rgba("+color.fill+", 0.13)";
+ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+ctx.setLineDash([]);
+ctx.strokeStyle = "rgba(54, 31, 14, 0.92)";
+ctx.lineWidth = 7 / scale;
+ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+ctx.strokeStyle = "rgba("+color.main+", 0.96)";
+ctx.lineWidth = 3 / scale;
+ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+ctx.strokeStyle = "rgba("+color.dark+", 0.96)";
+ctx.lineWidth = 5 / scale;
+const corner = Math.min(42 / scale, rect.w / 3, rect.h / 3);
+    ctx.beginPath();
+    ctx.moveTo(rect.x, rect.y + corner);
+    ctx.lineTo(rect.x, rect.y);
+    ctx.lineTo(rect.x + corner, rect.y);
+    ctx.moveTo(rect.x + rect.w - corner, rect.y);
+    ctx.lineTo(rect.x + rect.w, rect.y);
+    ctx.lineTo(rect.x + rect.w, rect.y + corner);
+    ctx.moveTo(rect.x + rect.w, rect.y + rect.h - corner);
+    ctx.lineTo(rect.x + rect.w, rect.y + rect.h);
+    ctx.lineTo(rect.x + rect.w - corner, rect.y + rect.h);
+    ctx.moveTo(rect.x + corner, rect.y + rect.h);
+    ctx.lineTo(rect.x, rect.y + rect.h);
+    ctx.lineTo(rect.x, rect.y + rect.h - corner);
+    ctx.stroke();
+}
+
+function drawZoneShape(ctx, shape, visualScale = 1){
+if(!isDrawableZoneShape(shape)) return;
+ctx.save();
+const scale = Math.max(0.1, visualScale);
+const color = getZoneColor(shape.color);
+
+if(shape.type === "line"){
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "rgba("+color.main+", 0.58)";
+    ctx.lineWidth = 5 / scale;
+    ctx.beginPath();
+    ctx.moveTo(shape.x1, shape.y1);
+    ctx.lineTo(shape.x2, shape.y2);
+    ctx.stroke();
+}
+
+if(shape.type === "incident"){
+    const cx = shape.x + shape.w / 2;
+    const cy = shape.y + shape.h / 2;
+    const rx = shape.w / 2;
+    const ry = shape.h / 2;
+    ctx.fillStyle = "rgba("+color.fill+", 0.08)";
+    ctx.strokeStyle = "rgba("+color.main+", 0.68)";
+    ctx.lineWidth = 6 / scale;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.strokeStyle = "rgba(54, 31, 14, 0.58)";
+    ctx.lineWidth = 2 / scale;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+    ctx.stroke();
+}
+
+if(shape.type === "shield"){
+    drawShieldMarker(ctx, shape, scale, color);
+}
+
+    ctx.restore();
+}
+
+function drawShieldMarker(ctx, shape, scale, color){
+const size = 34 / scale;
+const x = shape.x1;
+const y = shape.y1;
+ctx.translate(x, y);
+ctx.fillStyle = "rgba("+color.dark+", 0.92)";
+ctx.strokeStyle = "rgba(245, 226, 180, 0.92)";
+ctx.lineWidth = 3 / scale;
+ctx.beginPath();
+ctx.moveTo(0, -size * 0.62);
+ctx.lineTo(size * 0.50, -size * 0.34);
+ctx.lineTo(size * 0.40, size * 0.28);
+ctx.quadraticCurveTo(0, size * 0.68, -size * 0.40, size * 0.28);
+ctx.lineTo(-size * 0.50, -size * 0.34);
+ctx.closePath();
+ctx.fill();
+ctx.stroke();
+ctx.fillStyle = "rgba("+color.main+", 0.95)";
+ctx.fillRect(-size * 0.08, -size * 0.46, size * 0.16, size * 0.86);
+ctx.fillRect(-size * 0.32, -size * 0.18, size * 0.64, size * 0.14);
+}
+
+function applyZoneMapZoom(){
+const canvas = document.getElementById("zoneMapCanvas");
+if(!canvas) return;
+canvas.style.width = Math.round(canvas.width * zoneMapZoom)+"px";
+document.getElementById("locationMapStatus").textContent = "Zoom "+Math.round(zoneMapZoom * 100)+"%.";
+}
+
+function setZoneMapZoom(delta){
+const canvas = document.getElementById("zoneMapCanvas");
+const wrapper = document.querySelector(".zone-map-canvas-wrap");
+const previousZoom = zoneMapZoom;
+let centerX = null;
+let centerY = null;
+
+if(canvas && wrapper){
+    centerX = (wrapper.scrollLeft + wrapper.clientWidth / 2) / previousZoom;
+    centerY = (wrapper.scrollTop + wrapper.clientHeight / 2) / previousZoom;
+}
+
+zoneMapZoom = Math.max(0.08, Math.min(2.5, zoneMapZoom + delta));
+applyZoneMapZoom();
+
+if(canvas && wrapper && centerX !== null && centerY !== null){
+    wrapper.scrollLeft = centerX * zoneMapZoom - wrapper.clientWidth / 2;
+    wrapper.scrollTop = centerY * zoneMapZoom - wrapper.clientHeight / 2;
+}
+}
+
+function resetZoneMapZoom(){
+const canvas = document.getElementById("zoneMapCanvas");
+const wrapper = document.querySelector(".zone-map-canvas-wrap");
+if(canvas && wrapper){
+    zoneMapZoom = Math.max(0.08, Math.min(1, wrapper.clientWidth / canvas.width));
+} else {
+    zoneMapZoom = 0.12;
+}
+applyZoneMapZoom();
+if(canvas && wrapper){
+    wrapper.scrollLeft = 0;
+    wrapper.scrollTop = 0;
+}
+}
+
+function getVisibleZoneMapRect(){
+const canvas = document.getElementById("zoneMapCanvas");
+const wrapper = document.querySelector(".zone-map-canvas-wrap");
+if(!canvas || !wrapper) return { x:0, y:0, w:canvas.width, h:canvas.height };
+
+const scale = Math.max(0.1, zoneMapZoom);
+const x = Math.max(0, wrapper.scrollLeft / scale);
+const y = Math.max(0, wrapper.scrollTop / scale);
+const w = Math.min(canvas.width - x, wrapper.clientWidth / scale);
+const h = Math.min(canvas.height - y, wrapper.clientHeight / scale);
+
+return {
+    x: Math.round(x),
+    y: Math.round(y),
+    w: Math.max(1, Math.round(w)),
+    h: Math.max(1, Math.round(h))
+};
+}
+
+function setZoneMapTool(tool){
+zoneMapTool = ["incident", "line", "shield", "erase"].includes(tool) ? tool : "incident";
+document.querySelectorAll(".zone-map-toolbar button[id^='zoneTool']").forEach(button => {
+    button.classList.remove("active");
+});
+const activeButton = document.getElementById(
+    zoneMapTool === "incident" ? "zoneToolIncident" :
+    zoneMapTool === "line" ? "zoneToolLine" :
+    zoneMapTool === "shield" ? "zoneToolShield" :
+    "zoneToolErase"
+);
+if(activeButton) activeButton.classList.add("active");
+document.getElementById("locationMapStatus").textContent =
+    zoneMapTool === "incident" ? "Tracez la zone de l'incident." :
+    zoneMapTool === "line" ? "Tracez une ligne de patrouille." :
+    zoneMapTool === "shield" ? "Cliquez pour placer un bouclier de garde." :
+    "Cliquez sur un marquage à supprimer.";
+drawZoneMap();
+}
+
+function setZoneMapColor(color){
+zoneMapColor = ["red", "gold", "blue", "green"].includes(color) ? color : "red";
+document.querySelectorAll(".zone-color-btn").forEach(button => button.classList.remove("active"));
+const activeButton = document.getElementById(
+    zoneMapColor === "red" ? "zoneColorRed" :
+    zoneMapColor === "gold" ? "zoneColorGold" :
+    zoneMapColor === "blue" ? "zoneColorBlue" :
+    "zoneColorGreen"
+);
+if(activeButton) activeButton.classList.add("active");
+document.getElementById("locationMapStatus").textContent = "Couleur changée.";
+}
+
+function setupZoneMapCanvas(){
+const canvas = document.getElementById("zoneMapCanvas");
+canvas.oncontextmenu = event => event.preventDefault();
+canvas.onmousedown = event => {
+    if(event.button === 2){
+        const wrapper = document.querySelector(".zone-map-canvas-wrap");
+        zoneMapPanStart = {
+            x:event.clientX,
+            y:event.clientY,
+            scrollLeft:wrapper.scrollLeft,
+            scrollTop:wrapper.scrollTop
+        };
+        canvas.style.cursor = "grabbing";
+        event.preventDefault();
+        document.getElementById("locationMapStatus").textContent = "Déplacement de la carte.";
+        return;
+    }
+    if(event.button !== 0) return;
+    event.preventDefault();
+    zoneMapDragStart = getZoneMapCanvasPoint(event);
+    if(zoneMapTool === "erase"){
+        eraseZoneShapeAt(zoneMapDragStart);
+        zoneMapDragStart = null;
+        zoneMapDraft = null;
+        return;
+    }
+    if(zoneMapTool === "shield"){
+        zoneMapShapes.push(buildZoneShape(zoneMapDragStart, zoneMapDragStart, "shield"));
+        zoneMapDragStart = null;
+        zoneMapDraft = null;
+        document.getElementById("locationMapStatus").textContent = "Bouclier placé.";
+        drawZoneMap();
+        return;
+    }
+    zoneMapDraft = buildZoneShape(zoneMapDragStart, zoneMapDragStart);
+    drawZoneMap();
+};
+canvas.onmousemove = event => {
+    if(zoneMapPanStart){
+        const wrapper = document.querySelector(".zone-map-canvas-wrap");
+        wrapper.scrollLeft = zoneMapPanStart.scrollLeft - (event.clientX - zoneMapPanStart.x);
+        wrapper.scrollTop = zoneMapPanStart.scrollTop - (event.clientY - zoneMapPanStart.y);
+        event.preventDefault();
+        return;
+    }
+    if(!zoneMapDragStart) return;
+    zoneMapDraft = buildZoneShape(zoneMapDragStart, getZoneMapCanvasPoint(event));
+    drawZoneMap();
+};
+window.onmouseup = event => {
+    if(zoneMapPanStart && event.button === 2){
+        zoneMapPanStart = null;
+        canvas.style.cursor = "crosshair";
+        document.getElementById("locationMapStatus").textContent = "Carte déplacée.";
+        return;
+    }
+    if(!zoneMapDragStart) return;
+    if(event.button !== 0) return;
+    const shape = buildZoneShape(zoneMapDragStart, getZoneMapCanvasPoint(event));
+    if(isDrawableZoneShape(shape)){
+        zoneMapShapes.push(shape);
+    }
+    zoneMapDraft = null;
+    zoneMapDragStart = null;
+    document.getElementById("locationMapStatus").textContent = "Marquage ajouté.";
+    drawZoneMap();
+};
+}
+
+function loadZoneMap(){
+return new Promise((resolve, reject) => {
+    if(zoneMapImage && zoneMapImage.complete){
+        resolve(zoneMapImage);
+        return;
+    }
+
+    const img = new Image();
+    img.onload = () => {
+        zoneMapImage = img;
+        resolve(img);
+    };
+    img.onerror = reject;
+    img.src = zoneMapSrc;
+});
+}
+
+async function openZoneMap(){
+const modal = document.getElementById("zoneMapModal");
+const canvas = document.getElementById("zoneMapCanvas");
+try {
+    const img = await loadZoneMap();
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    setupZoneMapCanvas();
+    drawZoneMap();
+    modal.classList.add("open");
+    resetZoneMapZoom();
+    setZoneMapTool(zoneMapTool);
+} catch(e) {
+    document.getElementById("locationMapStatus").textContent = "Carte indisponible.";
+}
+}
+
+function closeZoneMap(event){
+const modal = document.getElementById("zoneMapModal");
+if(event && event.target !== modal) return;
+modal.classList.remove("open");
+}
+
+function generateZoneMapImage(){
+const canvas = document.getElementById("zoneMapCanvas");
+if(!zoneMapShapes.length){
+    document.getElementById("locationMapStatus").textContent = "Ajoutez au moins un marquage avant de générer.";
+    return;
+}
+
+const outputRect = getVisibleZoneMapRect();
+const visibleShapes = zoneMapShapes.filter(shape => zoneShapeIntersectsRect(shape, outputRect));
+if(!visibleShapes.length){
+    document.getElementById("locationMapStatus").textContent = "Aucun marquage n'est visible à l'écran.";
+    return;
+}
+
+const outCanvas = document.createElement("canvas");
+const maxOutputSize = 1600;
+const outputScale = Math.min(1, maxOutputSize / Math.max(outputRect.w, outputRect.h));
+outCanvas.width = Math.max(1, Math.round(outputRect.w * outputScale));
+outCanvas.height = Math.max(1, Math.round(outputRect.h * outputScale));
+const outCtx = outCanvas.getContext("2d");
+outCtx.drawImage(
+    zoneMapImage,
+    outputRect.x, outputRect.y, outputRect.w, outputRect.h,
+    0, 0, outCanvas.width, outCanvas.height
+);
+
+visibleShapes.forEach(shape => {
+    drawZoneShape(outCtx, shiftZoneShape(shape, outputRect, outputScale), 1);
+});
+
+drawZoneMap();
+const dataUrl = outCanvas.toDataURL("image/jpeg", 0.82);
+document.getElementById("zoneMapPreview").src = dataUrl;
+document.getElementById("zoneMapDownload").href = dataUrl;
+document.getElementById("zoneMapPreviewBox").style.display = "block";
+document.getElementById("locationMapStatus").textContent = "Image visible prête.";
+}
+
+function clearZoneMapSelection(){
+zoneMapShapes = [];
+zoneMapDraft = null;
+zoneMapDragStart = null;
+drawZoneMap();
+document.getElementById("zoneMapPreviewBox").style.display = "none";
+document.getElementById("zoneMapPreview").removeAttribute("src");
+document.getElementById("zoneMapDownload").removeAttribute("href");
+document.getElementById("locationMapStatus").textContent = "Zone effacée.";
 }
 
 function generate(options = {}){
