@@ -483,6 +483,35 @@ a.quiet-btn {
     color:#3f2a18;
 }
 
+.law-text strong {
+    display:block;
+    margin-bottom:6px;
+}
+
+.law-detail-paragraph {
+    margin:0 0 8px;
+}
+
+.law-detail-paragraph:last-child {
+    margin-bottom:0;
+}
+
+.law-bullet-list {
+    margin:8px 0;
+    padding-left:18px;
+    display:grid;
+    gap:7px;
+}
+
+.law-bullet-list li {
+    padding-left:3px;
+}
+
+.law-bullet-index {
+    font-weight:bold;
+    color:#5e2d1e;
+}
+
 .selected-laws {
     margin:8px 0 12px;
     padding:10px;
@@ -2556,6 +2585,36 @@ function escapeHtml(value){
 return String(value).replace(/[&<>"]/g, char => ({"&":"&amp;", "<":"&lt;", ">":"&gt;", "\"":"&quot;"}[char]));
 }
 
+function formatLawDetailText(value, category){
+let text = String(value || "").trim();
+let normalized = text
+    .replace(/\s+(?=(?:[1-9]|1[0-9])(?:[\).:\/-]|[°º])\s*)/g, "\n")
+    .replace(/\n{3,}/g, "\n\n");
+let lines = normalized.split(/\n+/).map(line => line.trim()).filter(Boolean);
+let html = category ? "<strong>"+escapeHtml(category)+"</strong>" : "";
+let listItems = [];
+
+function flushList(){
+    if(!listItems.length) return;
+    html += "<ul class=\"law-bullet-list\">"+listItems.join("")+"</ul>";
+    listItems = [];
+}
+
+lines.forEach(line => {
+    const numbered = line.match(/^((?:[1-9]|1[0-9])(?:[\).:\/-]|[°º]))\s*(.+)$/);
+    if(numbered){
+        listItems.push("<li><span class=\"law-bullet-index\">"+escapeHtml(numbered[1])+"</span> "+escapeHtml(numbered[2])+"</li>");
+        return;
+    }
+
+    flushList();
+    html += "<p class=\"law-detail-paragraph\">"+escapeHtml(line)+"</p>";
+});
+
+flushList();
+return html;
+}
+
 function formatWatchDateTime(value){
 if(!value) return "";
 let date = new Date(value);
@@ -2590,7 +2649,7 @@ target.innerHTML = lawsToRender.map(law => {
 <input type="checkbox" class="law-check" data-key="${escapeHtml(key)}" ${checked} onclick="event.stopPropagation()" onchange="toggleLawSelection(this)">
 ${escapeHtml(law.article)} - ${escapeHtml(law.title)}
 </summary>
-<p class="law-text"><strong>${escapeHtml(law.category)}</strong><br>${escapeHtml(law.text)}</p>
+<div class="law-text">${formatLawDetailText(law.text, law.category)}</div>
 </details>
 `;
 }).join("");
@@ -2623,20 +2682,20 @@ target.innerHTML = lawsToRender.slice(0, 8).map(law => {
 <span class="law-result-text">${escapeHtml(excerpt)}</span>
 <span class="law-result-hint">Cliquer pour développer</span>
 </summary>
-<span class="law-result-full" onclick="this.closest('.law-result-detail').open = false">${escapeHtml(law.text)}</span>
+<div class="law-result-full" onclick="this.closest('.law-result-detail').open = false">${formatLawDetailText(law.text)}</div>
 </details>
 ` : `
 <span class="law-result-title">${escapeHtml(law.article)} - ${escapeHtml(law.title)}</span>
 <span class="law-result-meta">${escapeHtml(source)} · ${escapeHtml(law.category)}</span>
-<span class="law-result-text">${escapeHtml(law.text)}</span>
+<div class="law-result-text">${formatLawDetailText(law.text)}</div>
 `;
 
     return `
 <div class="law-result">
 <input type="checkbox" data-key="${escapeHtml(key)}" ${checked} onclick="event.stopPropagation()" onchange="toggleLawSelection(this)">
-<span>
+<div>
 ${content}
-</span>
+</div>
 </div>
 `;
 }).join("");
@@ -2671,7 +2730,7 @@ target.innerHTML = filtered.map(law => {
 <summary class="law-title">
 <span>${escapeHtml(law.article)} - ${escapeHtml(law.title)}<span class="law-codex-source">${escapeHtml(lawSourceLabel(law))} · ${escapeHtml(law.category)}</span></span>
 </summary>
-<p class="law-text">${escapeHtml(law.text)}</p>
+<div class="law-text">${formatLawDetailText(law.text)}</div>
 </details>
 `;
 }).join("");
