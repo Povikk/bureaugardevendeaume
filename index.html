@@ -1086,7 +1086,38 @@ pre {
 }
 
 .map-dialog {
-    width:min(940px, 96vw);
+    width:min(1400px, 98vw);
+}
+
+.map-viewer-toolbar {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin:0 0 8px;
+    color:#5e4328;
+    font-size:12px;
+    font-style:italic;
+}
+
+.map-viewer-toolbar .quiet-btn {
+    width:auto;
+    min-height:28px;
+    margin:0;
+    padding:5px 10px;
+    font-size:12px;
+}
+
+.map-modal-viewport {
+    overflow:auto;
+    max-height:82vh;
+    border:1px solid rgba(70,40,20,0.34);
+    background:rgba(42,25,13,0.24);
+    cursor:zoom-in;
+}
+
+.map-modal-viewport.panning {
+    cursor:grabbing;
 }
 
 .zone-map-dialog {
@@ -1136,6 +1167,15 @@ pre {
     outline:2px solid rgba(245,230,200,0.82) !important;
 }
 
+.zone-tool-hint {
+    display:block;
+    padding:7px 4px;
+    color:rgba(63,42,24,0.62);
+    font-size:11px;
+    font-style:italic;
+    text-align:center;
+}
+
 .zone-map-canvas-wrap {
     overflow:auto;
     aspect-ratio:16 / 9;
@@ -1181,11 +1221,10 @@ pre {
 
 .map-dialog img {
     width:100%;
-    max-height:78vh;
-    object-fit:contain;
     display:block;
+    max-width:none;
+    height:auto;
     background:rgba(42,25,13,0.24);
-    border:1px solid rgba(70,40,20,0.34);
 }
 
 .map-remove,
@@ -1587,7 +1626,13 @@ Une fois terminé, utilisez <strong>Copier le titre</strong> puis collez-le dans
 <div class="watch-modal" id="mapModal" onclick="closeMapModal(event)">
 <div class="watch-dialog map-dialog" onclick="event.stopPropagation()">
 <h3 id="mapModalTitle">Carte</h3>
+<div class="map-viewer-toolbar">
+<span>Molette pour zoomer</span>
+<button class="quiet-btn" type="button" onclick="resetServiceMapZoom()">Vue complète</button>
+</div>
+<div class="map-modal-viewport" id="mapModalViewport" onwheel="handleServiceMapWheel(event)">
 <img id="mapModalImage" src="" alt="">
+</div>
 <button class="quiet-btn" type="button" onclick="closeMapModal()">Fermer</button>
 </div>
 </div>
@@ -1622,11 +1667,10 @@ Une fois terminé, utilisez <strong>Copier le titre</strong> puis collez-le dans
 <button class="zone-color-btn" id="zoneColorBlue" type="button" onclick="setZoneMapColor('blue')" style="background:#2e5f82" title="Bleu"></button>
 <button class="zone-color-btn" id="zoneColorGreen" type="button" onclick="setZoneMapColor('green')" style="background:#557a3d" title="Vert"></button>
 </div>
-<button class="quiet-btn" type="button" onclick="setZoneMapZoom(-0.08)" title="Dézoomer">-</button>
-<button class="quiet-btn" type="button" onclick="setZoneMapZoom(0.08)" title="Zoomer">+</button>
+<span class="zone-tool-hint">Molette</span>
 <button class="quiet-btn" type="button" onclick="resetZoneMapZoom()" title="Vue complète">Vue</button>
 </div>
-<div class="zone-map-canvas-wrap">
+<div class="zone-map-canvas-wrap" onwheel="handleZoneMapWheel(event)">
 <canvas id="zoneMapCanvas"></canvas>
 </div>
 </div>
@@ -1718,6 +1762,8 @@ let zoneMapPanStart = null;
 let zoneMapZoom = 1;
 let zoneMapTool = "incident";
 let zoneMapColor = "red";
+let serviceMapZoom = 1;
+let serviceMapPanStart = null;
 const defaultServiceMaps = [
     {
         id: "00000000-0000-0000-0000-000000000001",
@@ -3259,14 +3305,90 @@ const map = serviceMaps[index];
 if(!map) return;
 
 document.getElementById("mapModalTitle").textContent = map.title;
-document.getElementById("mapModalImage").src = map.src;
-document.getElementById("mapModalImage").alt = map.title;
+const image = document.getElementById("mapModalImage");
+image.onload = resetServiceMapZoom;
+image.src = map.src;
+image.alt = map.title;
 document.getElementById("mapModal").classList.add("open");
+setupServiceMapPan();
+resetServiceMapZoom();
 }
 
 function closeMapModal(event){
 if(event && event.target !== document.getElementById("mapModal")) return;
+serviceMapPanStart = null;
+const viewport = document.getElementById("mapModalViewport");
+if(viewport) viewport.classList.remove("panning");
 document.getElementById("mapModal").classList.remove("open");
+}
+
+function resetServiceMapZoom(){
+const image = document.getElementById("mapModalImage");
+const viewport = document.getElementById("mapModalViewport");
+if(!image || !viewport) return;
+serviceMapZoom = 1;
+image.style.width = "100%";
+viewport.scrollLeft = 0;
+viewport.scrollTop = 0;
+}
+
+function setupServiceMapPan(){
+const viewport = document.getElementById("mapModalViewport");
+if(!viewport || viewport.dataset.panReady === "true") return;
+viewport.dataset.panReady = "true";
+viewport.oncontextmenu = event => event.preventDefault();
+viewport.addEventListener("mousedown", event => {
+    if(event.button !== 2) return;
+    event.preventDefault();
+    serviceMapPanStart = {
+        x:event.clientX,
+        y:event.clientY,
+        scrollLeft:viewport.scrollLeft,
+        scrollTop:viewport.scrollTop
+    };
+    viewport.classList.add("panning");
+});
+window.addEventListener("mousemove", event => {
+    if(!serviceMapPanStart) return;
+    viewport.scrollLeft = serviceMapPanStart.scrollLeft - (event.clientX - serviceMapPanStart.x);
+    viewport.scrollTop = serviceMapPanStart.scrollTop - (event.clientY - serviceMapPanStart.y);
+});
+window.addEventListener("mouseup", event => {
+    if(event.button !== 2 || !serviceMapPanStart) return;
+    serviceMapPanStart = null;
+    viewport.classList.remove("panning");
+});
+}
+
+function handleServiceMapWheel(event){
+const image = document.getElementById("mapModalImage");
+const viewport = document.getElementById("mapModalViewport");
+if(!image || !viewport || !image.src) return;
+event.preventDefault();
+
+const viewportRect = viewport.getBoundingClientRect();
+const imageRect = image.getBoundingClientRect();
+const oldWidth = imageRect.width || viewport.clientWidth;
+const oldHeight = imageRect.height || viewport.clientHeight;
+const pointerX = Math.max(0, Math.min(oldWidth, event.clientX - imageRect.left));
+const pointerY = Math.max(0, Math.min(oldHeight, event.clientY - imageRect.top));
+const ratioX = oldWidth ? pointerX / oldWidth : 0;
+const ratioY = oldHeight ? pointerY / oldHeight : 0;
+const oldZoom = serviceMapZoom;
+const direction = event.deltaY < 0 ? 1 : -1;
+
+serviceMapZoom = Math.max(1, Math.min(12, serviceMapZoom + direction * 0.32));
+if(serviceMapZoom === oldZoom) return;
+
+const baseWidth = viewport.clientWidth;
+const newWidth = Math.max(baseWidth, Math.round(baseWidth * serviceMapZoom));
+image.style.width = newWidth+"px";
+
+requestAnimationFrame(() => {
+    const newHeight = image.getBoundingClientRect().height;
+    viewport.scrollLeft = ratioX * newWidth - (event.clientX - viewportRect.left);
+    viewport.scrollTop = ratioY * newHeight - (event.clientY - viewportRect.top);
+});
 }
 
 function getWatchLabel(type){
@@ -3873,7 +3995,14 @@ canvas.style.width = Math.round(canvas.width * zoneMapZoom)+"px";
 document.getElementById("locationMapStatus").textContent = "Zoom "+Math.round(zoneMapZoom * 100)+"%.";
 }
 
-function setZoneMapZoom(delta){
+function getZoneMapMinZoom(){
+const canvas = document.getElementById("zoneMapCanvas");
+const wrapper = document.querySelector(".zone-map-canvas-wrap");
+if(!canvas || !wrapper || !canvas.width) return 0.18;
+return Math.max(0.18, Math.min(1, wrapper.clientWidth / canvas.width));
+}
+
+function setZoneMapZoom(delta, focus){
 const canvas = document.getElementById("zoneMapCanvas");
 const wrapper = document.querySelector(".zone-map-canvas-wrap");
 const previousZoom = zoneMapZoom;
@@ -3881,26 +4010,43 @@ let centerX = null;
 let centerY = null;
 
 if(canvas && wrapper){
-    centerX = (wrapper.scrollLeft + wrapper.clientWidth / 2) / previousZoom;
-    centerY = (wrapper.scrollTop + wrapper.clientHeight / 2) / previousZoom;
+    if(focus){
+        centerX = (wrapper.scrollLeft + focus.x) / previousZoom;
+        centerY = (wrapper.scrollTop + focus.y) / previousZoom;
+    } else {
+        centerX = (wrapper.scrollLeft + wrapper.clientWidth / 2) / previousZoom;
+        centerY = (wrapper.scrollTop + wrapper.clientHeight / 2) / previousZoom;
+    }
 }
 
-zoneMapZoom = Math.max(0.08, Math.min(2.5, zoneMapZoom + delta));
+zoneMapZoom = Math.max(getZoneMapMinZoom(), Math.min(4, zoneMapZoom + delta));
 applyZoneMapZoom();
 
 if(canvas && wrapper && centerX !== null && centerY !== null){
-    wrapper.scrollLeft = centerX * zoneMapZoom - wrapper.clientWidth / 2;
-    wrapper.scrollTop = centerY * zoneMapZoom - wrapper.clientHeight / 2;
+    wrapper.scrollLeft = centerX * zoneMapZoom - (focus ? focus.x : wrapper.clientWidth / 2);
+    wrapper.scrollTop = centerY * zoneMapZoom - (focus ? focus.y : wrapper.clientHeight / 2);
 }
+}
+
+function handleZoneMapWheel(event){
+const wrapper = document.querySelector(".zone-map-canvas-wrap");
+if(!wrapper) return;
+event.preventDefault();
+const rect = wrapper.getBoundingClientRect();
+const focus = {
+    x:event.clientX - rect.left,
+    y:event.clientY - rect.top
+};
+setZoneMapZoom(event.deltaY < 0 ? 0.16 : -0.16, focus);
 }
 
 function resetZoneMapZoom(){
 const canvas = document.getElementById("zoneMapCanvas");
 const wrapper = document.querySelector(".zone-map-canvas-wrap");
 if(canvas && wrapper){
-    zoneMapZoom = Math.max(0.08, Math.min(1, wrapper.clientWidth / canvas.width));
+    zoneMapZoom = getZoneMapMinZoom();
 } else {
-    zoneMapZoom = 0.12;
+    zoneMapZoom = 0.18;
 }
 applyZoneMapZoom();
 if(canvas && wrapper){
