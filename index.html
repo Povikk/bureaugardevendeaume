@@ -84,6 +84,7 @@ body::after {
     top:24px;
     left:30px;
     display:flex;
+    flex-direction:column;
     gap:8px;
     z-index:3;
 }
@@ -107,6 +108,322 @@ body::after {
 .law-codex-btn:hover,
 .law-codex-btn:focus {
     opacity:1;
+}
+
+.org-dialog {
+    width:min(2100px, 99vw);
+}
+
+.org-head {
+    display:flex;
+    justify-content:space-between;
+    gap:14px;
+    align-items:flex-start;
+    margin-bottom:12px;
+    border-bottom:1px solid rgba(70,40,20,0.24);
+    padding-bottom:10px;
+}
+
+.org-head p {
+    margin:3px 0 0;
+    color:#5e4328;
+    font-size:13px;
+    font-style:italic;
+}
+
+.org-actions {
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+
+.org-actions button {
+    width:auto;
+    margin:0;
+    min-height:30px;
+    padding:6px 10px;
+    font-size:12px;
+}
+
+.org-chart {
+    overflow:auto;
+    padding:24px 18px 28px;
+    min-height:520px;
+    max-height:82vh;
+    background:
+        radial-gradient(circle at 50% 8%, rgba(181,133,53,0.16), transparent 28%),
+        rgba(255,252,239,0.34);
+    border:1px solid rgba(70,40,20,0.28);
+    cursor:grab;
+}
+
+.org-chart.panning {
+    cursor:grabbing;
+}
+
+.org-board {
+    min-width:1760px;
+}
+
+.org-level {
+    display:flex;
+    justify-content:center;
+    gap:22px;
+    align-items:flex-start;
+    min-width:max-content;
+}
+
+.org-command-row,
+.org-lieutenant-row,
+.org-sergeant-row {
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    gap:28px;
+}
+
+.org-command-row {
+    margin-bottom:34px;
+}
+
+.org-lieutenant-row {
+    gap:38px;
+    align-items:stretch;
+}
+
+.org-branch {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-width:410px;
+    position:relative;
+}
+
+.org-branch > .org-card {
+    min-height:142px;
+}
+
+.org-branch > .org-card::after {
+    content:"";
+    position:absolute;
+    left:50%;
+    bottom:-30px;
+    width:2px;
+    height:30px;
+    background:rgba(35,23,14,0.72);
+}
+
+.org-sergeant-row {
+    margin-top:30px;
+    position:relative;
+}
+
+.org-sergeant-row::before {
+    content:"";
+    position:absolute;
+    top:-15px;
+    left:8%;
+    right:8%;
+    height:2px;
+    background:rgba(35,23,14,0.72);
+}
+
+.org-sergeant-column {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    position:relative;
+}
+
+.org-sergeant-column::before {
+    content:"";
+    position:absolute;
+    top:-30px;
+    left:50%;
+    width:2px;
+    height:30px;
+    background:rgba(35,23,14,0.72);
+}
+
+.org-guard-stack {
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    gap:10px;
+    margin-top:28px;
+    position:relative;
+}
+
+.org-guard-column {
+    display:grid;
+    gap:9px;
+}
+
+.org-guard-stack::before {
+    content:"";
+    position:absolute;
+    top:-28px;
+    left:50%;
+    width:2px;
+    height:28px;
+    background:rgba(35,23,14,0.72);
+}
+
+.org-node-wrap {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    position:relative;
+}
+
+.org-children {
+    display:flex;
+    gap:18px;
+    align-items:flex-start;
+    justify-content:center;
+    margin-top:28px;
+    position:relative;
+}
+
+.org-children::before {
+    content:"";
+    position:absolute;
+    top:-15px;
+    left:10%;
+    right:10%;
+    height:2px;
+    background:rgba(35,23,14,0.72);
+}
+
+.org-node-wrap.has-children > .org-card::after {
+    content:"";
+    position:absolute;
+    left:50%;
+    bottom:-30px;
+    width:2px;
+    height:30px;
+    background:rgba(35,23,14,0.72);
+}
+
+.org-children > .org-node-wrap::before {
+    content:"";
+    position:absolute;
+    top:-28px;
+    left:50%;
+    width:2px;
+    height:28px;
+    background:rgba(35,23,14,0.72);
+}
+
+.org-card {
+    position:relative;
+    width:220px;
+    min-height:122px;
+    padding:0 0 8px;
+    background:
+        linear-gradient(180deg, rgba(251,241,206,0.96), rgba(222,194,132,0.88));
+    border:2px solid rgba(33,22,13,0.86);
+    box-shadow:0 8px 20px rgba(24,13,7,0.22), inset 0 0 0 2px rgba(181,133,53,0.28);
+}
+
+.org-card::before,
+.org-card::after {
+    pointer-events:none;
+}
+
+.org-card-name {
+    display:block;
+    min-height:40px;
+    padding:7px 22px 7px 8px;
+    margin:0 0 8px;
+    background:linear-gradient(#0e2a3f, #061927);
+    color:#f3e5c0;
+    text-align:center;
+    font-weight:bold;
+    font-size:17px;
+    line-height:1.15;
+    border-bottom:2px solid rgba(181,133,53,0.85);
+    text-shadow:0 1px 0 #000;
+    overflow:hidden;
+    overflow-wrap:anywhere;
+}
+
+.org-card-name.long-name {
+    font-size:14px;
+    line-height:1.08;
+}
+
+.org-card-name.very-long-name {
+    font-size:12px;
+    line-height:1.04;
+}
+
+.org-card[data-grade="Capitaine"] .org-card-name {
+    background:linear-gradient(#5a1e18, #2c0e0b);
+}
+
+.org-card[data-grade="Lieutenant"] .org-card-name {
+    background:linear-gradient(#163451, #071b2c);
+}
+
+.org-card[data-grade="Sergent"] .org-card-name {
+    background:linear-gradient(#3f3118, #21170c);
+}
+
+.org-info {
+    padding:0 12px;
+    display:grid;
+    gap:2px;
+    font-size:13px;
+}
+
+.org-info span {
+    display:block;
+}
+
+.org-info strong {
+    color:#2f1f12;
+}
+
+.org-card-actions {
+    position:absolute;
+    right:4px;
+    top:4px;
+    display:grid;
+    gap:2px;
+    z-index:2;
+}
+
+.org-card-actions button {
+    width:14px;
+    height:14px;
+    min-height:14px;
+    padding:0;
+    margin:0;
+    border:none;
+    font-size:9px;
+    line-height:14px;
+    transform:none;
+    box-shadow:none;
+}
+
+.org-card-actions button:hover,
+.org-card-actions button:active {
+    transform:none;
+}
+
+.org-empty {
+    text-align:center;
+    color:#5e4328;
+    padding:40px 10px;
+    font-style:italic;
+}
+
+.org-editor-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
 }
 
 h2 {
@@ -974,6 +1291,10 @@ pre {
     box-shadow:0 24px 70px rgba(12,8,5,0.48);
 }
 
+.watch-dialog.org-dialog {
+    width:min(2100px, 99vw);
+}
+
 .watch-dialog h3 {
     margin:0 0 10px;
     font-size:18px;
@@ -1276,6 +1597,7 @@ pre {
 
     .watch-form-row,
     .watch-dialog-actions,
+    .org-editor-grid,
     .watch-summary,
     .guard-row,
     .context-row,
@@ -1315,6 +1637,7 @@ pre {
 
 <div class="top-tool-buttons">
 <button class="law-codex-btn" type="button" onclick="openZoneMap()">Cartographie</button>
+<button class="law-codex-btn" type="button" onclick="openOrgChart()">Organigramme</button>
 </div>
 <div class="top-tool-buttons right">
 <button class="law-codex-btn" type="button" onclick="openLawCodex()">Lois en vigueur</button>
@@ -1564,6 +1887,71 @@ Une fois terminé, utilisez <strong>Copier le titre</strong> puis collez-le dans
 
 </div>
 
+<div class="watch-modal" id="orgChartModal" onclick="closeOrgChart(event)">
+<div class="watch-dialog org-dialog" onclick="event.stopPropagation()">
+<div class="org-head">
+<div>
+<h3>Organigramme de la Garde de Vendeaume</h3>
+<p>Chaîne de commandement et répartition des effectifs. Molette pour zoomer, clic droit maintenu pour se déplacer.</p>
+<p id="orgStatus">Organigramme local.</p>
+</div>
+<div class="org-actions">
+<button type="button" onclick="openOrgEditor()">Ajouter</button>
+<button class="quiet-btn" type="button" onclick="resetOrgChartDemo()">Réinitialiser test</button>
+<button class="quiet-btn" type="button" onclick="resetOrgChartZoom()">Vue complète</button>
+<button class="quiet-btn" type="button" onclick="closeOrgChart()">Fermer</button>
+</div>
+</div>
+<div class="org-chart" id="orgChartView" onwheel="handleOrgChartWheel(event)"></div>
+</div>
+</div>
+
+<div class="watch-modal" id="orgEditorModal" onclick="closeOrgEditor(event)">
+<div class="watch-dialog" onclick="event.stopPropagation()">
+<h3 id="orgEditorTitle">Ajouter un membre</h3>
+<input type="hidden" id="orgEditorId">
+
+<div class="org-editor-grid">
+<input id="orgEditorName" placeholder="Nom et prénom">
+<select id="orgEditorRace">
+<option>Race</option>
+<option>Nordique</option>
+<option>Impérial</option>
+<option>Bréton</option>
+<option>Rougegarde</option>
+<option>Dunmer</option>
+<option>Altmer</option>
+<option>Bosmer</option>
+<option>Orque</option>
+<option>Khajiit</option>
+<option>Argonien</option>
+</select>
+</div>
+
+<div class="org-editor-grid">
+<select id="orgEditorGrade">
+<option>Garde</option>
+<option>Sergent</option>
+<option>Lieutenant</option>
+<option>Capitaine</option>
+</select>
+<select id="orgEditorParent"></select>
+</div>
+
+<div class="org-editor-grid">
+<input id="orgEditorSpecialty" placeholder="Spécialisation, ex : Guerrier, Archer...">
+<input id="orgEditorRole" placeholder="Fonction, ex : Sous-officier, Patrouilleur...">
+</div>
+
+<textarea id="orgEditorNote" placeholder="Note courte optionnelle"></textarea>
+
+<div class="watch-dialog-actions">
+<button type="button" onclick="saveOrgMember()">Valider</button>
+<button class="quiet-btn" type="button" onclick="closeOrgEditor()">Annuler</button>
+</div>
+</div>
+</div>
+
 <div class="watch-modal" id="lawCodexModal" onclick="closeLawCodex(event)">
 <div class="watch-dialog law-codex-dialog" onclick="event.stopPropagation()">
 <div class="law-codex-head">
@@ -1753,6 +2141,7 @@ let indivList = [];
 let supabaseClient = null;
 let watchBoardOnline = false;
 let serviceMapsOnline = false;
+let orgChartOnline = false;
 const zoneMapSrc = "assets/eastmarch-map.jpg";
 let zoneMapImage = null;
 let zoneMapShapes = [];
@@ -1764,6 +2153,33 @@ let zoneMapTool = "incident";
 let zoneMapColor = "red";
 let serviceMapZoom = 1;
 let serviceMapPanStart = null;
+const orgChartStorageKey = "skyrimrp_org_chart_v2";
+const orgRankOrder = { "Capitaine":0, "Lieutenant":1, "Sergent":2, "Garde":3 };
+let orgChartZoom = 1;
+let orgChartPanStart = null;
+const defaultOrgMembers = [
+    { id:"cap-ryska", parentId:"", name:"Ryska Gurvant", race:"Race", grade:"Capitaine", specialty:"Guerrier", role:"Officier supérieur", note:"" },
+    { id:"lt-memo", parentId:"cap-ryska", name:"Memo", race:"Race", grade:"Lieutenant", specialty:"Guerrier", role:"Second officier supérieur", note:"Branche I" },
+    { id:"lt-aeden", parentId:"cap-ryska", name:"Aeden", race:"Race", grade:"Lieutenant", specialty:"Guerrier", role:"Second officier supérieur", note:"Branche II" },
+    { id:"sgt-madesh", parentId:"lt-memo", name:"Madesh", race:"Race", grade:"Sergent", specialty:"Archer", role:"Sous-officier", note:"" },
+    { id:"sgt-xardo", parentId:"lt-memo", name:"Xar-do Sang de Marais", race:"Race", grade:"Sergent", specialty:"Guerrier", role:"Sous-officier", note:"" },
+    { id:"sgt-theranis", parentId:"lt-aeden", name:"Theranis Kingel", race:"Race", grade:"Sergent", specialty:"Guerrier", role:"Sous-officier", note:"" },
+    { id:"g-alrik", parentId:"sgt-madesh", name:"Alrik Brise-fer", race:"Race", grade:"Garde", specialty:"Guerrier", role:"Soldat", note:"Confirmé" },
+    { id:"g-joris", parentId:"sgt-madesh", name:"Joris Leusaint", race:"Race", grade:"Garde", specialty:"Guerrier", role:"Soldat", note:"Confirmé" },
+    { id:"g-runvald", parentId:"sgt-madesh", name:"Runvald SombreFer", race:"Race", grade:"Garde", specialty:"Archer", role:"Soldat", note:"Confirmé" },
+    { id:"g-shavee", parentId:"sgt-madesh", name:"Shavee Baie-Sucrée", race:"Race", grade:"Garde", specialty:"Cuisinier", role:"Chef cuisinier", note:"Confirmé" },
+    { id:"g-bald", parentId:"sgt-xardo", name:"Bald Forgecoeur", race:"Race", grade:"Garde", specialty:"Forgeron", role:"Soldat", note:"Confirmé" },
+    { id:"g-coeur-doux", parentId:"sgt-xardo", name:"Coeur Doux", race:"Race", grade:"Garde", specialty:"Guerrier", role:"Soldat", note:"Confirmé" },
+    { id:"g-heka-gaia", parentId:"sgt-xardo", name:"Héka GAIA", race:"Race", grade:"Garde", specialty:"Guerrier", role:"Soldat", note:"Confirmé" },
+    { id:"g-zogorn", parentId:"sgt-xardo", name:"Zogorn", race:"Race", grade:"Garde", specialty:"Guerrier", role:"Soldat", note:"Confirmé" },
+    { id:"g-pierre", parentId:"sgt-theranis", name:"Pierre Haute-Roche", race:"Race", grade:"Garde", specialty:"Guerrier", role:"Soldat", note:"Confirmé" },
+    { id:"g-badnir", parentId:"sgt-theranis", name:"Badnir Main de Fer", race:"Race", grade:"Garde", specialty:"Guerrier", role:"Soldat", note:"Confirmé" },
+    { id:"g-poh", parentId:"sgt-theranis", name:"Poh", race:"Race", grade:"Garde", specialty:"Guerrier", role:"Soldat", note:"Confirmé" },
+    { id:"g-vladhor", parentId:"sgt-theranis", name:"Vladhor", race:"Race", grade:"Garde", specialty:"Guerrier", role:"Soldat", note:"Confirmé" },
+    { id:"g-aime-la-nature", parentId:"sgt-theranis", name:"Aime La Nature", race:"Race", grade:"Garde", specialty:"Cuisinier", role:"Soldat", note:"Confirmé" },
+    { id:"g-rexwell", parentId:"", name:"Rexwell", race:"Race", grade:"Garde", specialty:"", role:"", note:"Absent, non affecté temporairement" }
+];
+let orgMembers = [];
 const defaultServiceMaps = [
     {
         id: "00000000-0000-0000-0000-000000000001",
@@ -2932,7 +3348,7 @@ setGuardPasswordState("");
 
 async function validateGuardPassword(showSuccess = false, statusTarget = "watch"){
 const password = getGuardPassword();
-const setStatus = statusTarget === "map" ? setMapStatus : setWatchStatus;
+const setStatus = statusTarget === "map" ? setMapStatus : statusTarget === "org" ? setOrgStatus : setWatchStatus;
 
 if(!password){
     setGuardPasswordState("bad");
@@ -2978,6 +3394,12 @@ if(statusTarget === "watch" && (!watchBoardOnline || !supabaseClient)){
 if(statusTarget === "map" && (!serviceMapsOnline || !supabaseClient)){
     setGuardPasswordState("bad");
     setMapStatus("Cartes indisponibles : synchronisation non prête.");
+    return false;
+}
+
+if(statusTarget === "org" && (!orgChartOnline || !supabaseClient)){
+    setGuardPasswordState("bad");
+    setOrgStatus("Organigramme indisponible : synchronisation non prête.");
     return false;
 }
 
@@ -3118,16 +3540,483 @@ restoreGuardPassword();
 supabaseClient = createSupabaseClient();
 await loadWatchBoardFromSupabase();
 await loadServiceMapsFromSupabase();
+await loadOrgChartFromSupabase();
 
 if(supabaseClient){
     setInterval(loadWatchBoardFromSupabase, 30000);
     setInterval(loadServiceMapsFromSupabase, 60000);
+    setInterval(loadOrgChartFromSupabase, 60000);
 }
 }
 
 function setMapStatus(message){
 const status = document.getElementById("mapStatus");
 if(status) status.textContent = message;
+}
+
+function setOrgStatus(message){
+const status = document.getElementById("orgStatus");
+if(status) status.textContent = message;
+}
+
+function normalizeOrgMember(member){
+return {
+    id: member && member.id ? String(member.id) : "org-"+Date.now()+"-"+Math.random().toString(16).slice(2),
+    parentId: member && member.parentId ? String(member.parentId) : "",
+    name: member && member.name ? String(member.name) : "",
+    race: member && member.race ? String(member.race) : "Race",
+    grade: member && ["Garde", "Sergent", "Lieutenant", "Capitaine"].includes(member.grade) ? member.grade : "Garde",
+    specialty: member && member.specialty ? String(member.specialty) : "",
+    role: member && member.role ? String(member.role) : "",
+    note: member && member.note ? String(member.note) : ""
+};
+}
+
+function loadOrgChart(){
+let saved = null;
+try {
+    saved = JSON.parse(localStorage.getItem(orgChartStorageKey));
+} catch(e) {
+    saved = null;
+}
+orgMembers = Array.isArray(saved) && saved.length
+    ? saved.map(normalizeOrgMember)
+    : defaultOrgMembers.map(normalizeOrgMember);
+}
+
+function saveOrgChart(){
+try {
+    localStorage.setItem(orgChartStorageKey, JSON.stringify(orgMembers));
+} catch(e) {}
+}
+
+function rowToOrgMember(row){
+return normalizeOrgMember({
+    id: row.id,
+    parentId: row.parent_id,
+    name: row.name,
+    race: row.race,
+    grade: row.grade,
+    specialty: row.specialty,
+    role: row.role,
+    note: row.note
+});
+}
+
+function orgMemberToPayload(member){
+return {
+    id: member.id || null,
+    parent_id: member.parentId || "",
+    name: member.name,
+    race: member.race,
+    grade: member.grade,
+    specialty: member.specialty,
+    role: member.role,
+    note: member.note
+};
+}
+
+async function loadOrgChartFromSupabase(){
+if(!supabaseClient){
+    loadOrgChart();
+    renderOrgChart();
+    setOrgStatus("Mode local : synchronisation non chargée.");
+    return;
+}
+
+const { data, error } = await supabaseClient
+    .from("guard_org_members")
+    .select("*")
+    .order("sort_order", { ascending:true })
+    .order("name", { ascending:true });
+
+if(error){
+    orgChartOnline = false;
+    loadOrgChart();
+    renderOrgChart();
+    setOrgStatus("Mode local : organigramme partagé non prêt.");
+    return;
+}
+
+orgChartOnline = true;
+orgMembers = (data || []).length ? data.map(rowToOrgMember) : defaultOrgMembers.map(normalizeOrgMember);
+saveOrgChart();
+renderOrgChart();
+setOrgStatus("Organigramme synchronisé.");
+}
+
+async function syncOrgMember(member){
+if(!orgChartOnline || !supabaseClient){
+    setOrgStatus("Modification locale : synchronisation non prête.");
+    return null;
+}
+
+if(!await validateGuardPassword(false, "org")){
+    setOrgStatus("Mot de passe garde requis ou incorrect pour modifier l'organigramme.");
+    return null;
+}
+
+const { data, error } = await supabaseClient.rpc("save_guard_org_member", {
+    p_password: getGuardPassword(),
+    p_member: orgMemberToPayload(member)
+});
+
+if(error){
+    setGuardPasswordState("bad");
+    setOrgStatus("Modification refusée : mot de passe incorrect ou table non prête.");
+    return null;
+}
+
+setGuardPasswordState("ok");
+return normalizeOrgMember({ ...member, id: data || member.id });
+}
+
+async function deleteOrgMemberFromSupabase(member){
+if(!orgChartOnline || !supabaseClient){
+    setOrgStatus("Suppression locale : synchronisation non prête.");
+    return false;
+}
+
+if(!await validateGuardPassword(false, "org")){
+    setOrgStatus("Mot de passe garde requis ou incorrect pour supprimer un membre.");
+    return false;
+}
+
+const { error } = await supabaseClient.rpc("delete_guard_org_member", {
+    p_password: getGuardPassword(),
+    p_member_id: member.id
+});
+
+if(error){
+    setGuardPasswordState("bad");
+    setOrgStatus("Suppression refusée : mot de passe incorrect ou table non prête.");
+    return false;
+}
+
+setGuardPasswordState("ok");
+return true;
+}
+
+function openOrgChart(){
+renderOrgChart();
+document.getElementById("orgChartModal").classList.add("open");
+setupOrgChartPan();
+centerOrgChartView();
+}
+
+function closeOrgChart(event){
+if(event && event.target !== document.getElementById("orgChartModal")) return;
+orgChartPanStart = null;
+const chart = document.getElementById("orgChartView");
+if(chart) chart.classList.remove("panning");
+document.getElementById("orgChartModal").classList.remove("open");
+}
+
+function centerOrgChartView(){
+const chart = document.getElementById("orgChartView");
+if(!chart) return;
+requestAnimationFrame(() => {
+    chart.scrollLeft = Math.max(0, (chart.scrollWidth - chart.clientWidth) / 2);
+    chart.scrollTop = 0;
+});
+}
+
+function getOrgChildren(parentId){
+return orgMembers
+    .filter(member => (member.parentId || "") === (parentId || ""))
+    .sort((a, b) => (orgRankOrder[a.grade] ?? 9) - (orgRankOrder[b.grade] ?? 9) || a.name.localeCompare(b.name));
+}
+
+function isOrgDescendant(memberId, possibleParentId){
+if(!memberId || !possibleParentId) return false;
+let current = orgMembers.find(member => member.id === possibleParentId);
+while(current){
+    if(current.parentId === memberId) return true;
+    current = orgMembers.find(member => member.id === current.parentId);
+}
+return false;
+}
+
+function renderOrgCard(member){
+const nameLength = (member.name || "").length;
+const nameClass = nameLength > 24 ? "very-long-name" : nameLength > 16 ? "long-name" : "";
+return `
+<div class="org-card" data-grade="${escapeHtml(member.grade)}">
+<span class="org-card-name ${nameClass}">${escapeHtml(member.name || "Sans nom")}</span>
+<div class="org-card-actions">
+<button type="button" onclick="openOrgEditor('${escapeHtml(member.id)}')" title="Modifier">✎</button>
+<button type="button" onclick="deleteOrgMember('${escapeHtml(member.id)}')" title="Supprimer">×</button>
+</div>
+<div class="org-info">
+<span><strong>Grade :</strong> ${escapeHtml(member.grade)}</span>
+<span><strong>Race :</strong> ${escapeHtml(member.race)}</span>
+${member.specialty ? "<span><strong>Spécialisation :</strong> "+escapeHtml(member.specialty)+"</span>" : ""}
+${member.role ? "<span><strong>Fonction :</strong> "+escapeHtml(member.role)+"</span>" : ""}
+${member.note ? "<span><strong>Note :</strong> "+escapeHtml(member.note)+"</span>" : ""}
+</div>
+</div>
+`;
+}
+
+function renderOrgGuardStack(guards){
+if(!guards.length) return "";
+const columnCount = guards.length > 10 ? 3 : guards.length > 5 ? 2 : 1;
+const perColumn = Math.ceil(guards.length / columnCount);
+let columns = [];
+
+for(let i = 0; i < columnCount; i++){
+    const chunk = guards.slice(i * perColumn, (i + 1) * perColumn);
+    if(chunk.length){
+        columns.push("<div class=\"org-guard-column\">"+chunk.map(renderOrgCard).join("")+"</div>");
+    }
+}
+
+return "<div class=\"org-guard-stack\">"+columns.join("")+"</div>";
+}
+
+function renderOrgSergeantColumn(sergeant){
+const guards = getOrgChildren(sergeant.id).filter(member => member.grade === "Garde");
+return `
+<div class="org-sergeant-column">
+${renderOrgCard(sergeant)}
+${renderOrgGuardStack(guards)}
+</div>
+`;
+}
+
+function renderOrgLieutenantBranch(lieutenant){
+const children = getOrgChildren(lieutenant.id);
+const sergeants = children.filter(member => member.grade === "Sergent");
+const directGuards = children.filter(member => member.grade === "Garde");
+const looseColumn = directGuards.length ? `
+<div class="org-sergeant-column">
+<div class="org-card" data-grade="Sergent">
+<span class="org-card-name">Sans sergent</span>
+<div class="org-info"><span><strong>Rattachement :</strong> ${escapeHtml(lieutenant.name)}</span></div>
+</div>
+${renderOrgGuardStack(directGuards)}
+</div>
+` : "";
+
+return `
+<div class="org-branch">
+${renderOrgCard(lieutenant)}
+${sergeants.length || looseColumn ? "<div class=\"org-sergeant-row\">"+sergeants.map(renderOrgSergeantColumn).join("")+looseColumn+"</div>" : ""}
+</div>
+`;
+}
+
+function renderOrgChart(){
+const target = document.getElementById("orgChartView");
+if(!target) return;
+const captains = orgMembers.filter(member => member.grade === "Capitaine").sort((a, b) => a.name.localeCompare(b.name));
+let lieutenants = orgMembers.filter(member => member.grade === "Lieutenant").sort((a, b) => a.name.localeCompare(b.name));
+const unassignedSergeants = orgMembers.filter(member => member.grade === "Sergent" && !orgMembers.some(parent => parent.id === member.parentId && parent.grade === "Lieutenant"));
+const unassignedGuards = orgMembers.filter(member => member.grade === "Garde" && !orgMembers.some(parent => parent.id === member.parentId && (parent.grade === "Sergent" || parent.grade === "Lieutenant")));
+
+if(!captains.length && !lieutenants.length && !unassignedSergeants.length && !unassignedGuards.length){
+    target.innerHTML = "<div class=\"org-empty\">Aucun membre dans l'organigramme.</div>";
+    return;
+}
+
+let fallbackBranch = "";
+if(unassignedSergeants.length || unassignedGuards.length){
+    fallbackBranch = `
+<div class="org-branch">
+<div class="org-card" data-grade="Lieutenant">
+<span class="org-card-name">Non affectés</span>
+<div class="org-info"><span><strong>Section :</strong> À classer</span></div>
+</div>
+<div class="org-sergeant-row">
+${unassignedSergeants.map(renderOrgSergeantColumn).join("")}
+${unassignedGuards.length ? `
+<div class="org-sergeant-column">
+<div class="org-card" data-grade="Sergent">
+<span class="org-card-name">Sans supérieur</span>
+<div class="org-info"><span><strong>Rattachement :</strong> À définir</span></div>
+</div>
+${renderOrgGuardStack(unassignedGuards)}
+</div>` : ""}
+</div>
+</div>`;
+}
+
+target.innerHTML = `
+<div class="org-board">
+${captains.length ? "<div class=\"org-command-row\">"+captains.map(renderOrgCard).join("")+"</div>" : ""}
+<div class="org-lieutenant-row">
+${lieutenants.map(renderOrgLieutenantBranch).join("")}
+${fallbackBranch}
+</div>
+</div>
+`;
+applyOrgChartZoom();
+}
+
+function applyOrgChartZoom(){
+const board = document.querySelector("#orgChartView .org-board");
+if(!board) return;
+board.style.zoom = orgChartZoom;
+}
+
+function resetOrgChartZoom(){
+orgChartZoom = 1;
+applyOrgChartZoom();
+const view = document.getElementById("orgChartView");
+if(view){
+    view.scrollLeft = 0;
+    view.scrollTop = 0;
+}
+}
+
+function handleOrgChartWheel(event){
+const view = document.getElementById("orgChartView");
+const board = document.querySelector("#orgChartView .org-board");
+if(!view || !board) return;
+event.preventDefault();
+
+const rect = view.getBoundingClientRect();
+const oldZoom = orgChartZoom;
+const pointerX = event.clientX - rect.left;
+const pointerY = event.clientY - rect.top;
+const contentX = (view.scrollLeft + pointerX) / oldZoom;
+const contentY = (view.scrollTop + pointerY) / oldZoom;
+const direction = event.deltaY < 0 ? 1 : -1;
+
+orgChartZoom = Math.max(0.55, Math.min(2.4, orgChartZoom + direction * 0.12));
+if(orgChartZoom === oldZoom) return;
+
+applyOrgChartZoom();
+requestAnimationFrame(() => {
+    view.scrollLeft = contentX * orgChartZoom - pointerX;
+    view.scrollTop = contentY * orgChartZoom - pointerY;
+});
+}
+
+function setupOrgChartPan(){
+const chart = document.getElementById("orgChartView");
+if(!chart || chart.dataset.panReady === "true") return;
+chart.dataset.panReady = "true";
+chart.oncontextmenu = event => event.preventDefault();
+chart.addEventListener("mousedown", event => {
+    if(event.button !== 2) return;
+    event.preventDefault();
+    orgChartPanStart = {
+        x:event.clientX,
+        y:event.clientY,
+        scrollLeft:chart.scrollLeft,
+        scrollTop:chart.scrollTop
+    };
+    chart.classList.add("panning");
+});
+window.addEventListener("mousemove", event => {
+    if(!orgChartPanStart) return;
+    chart.scrollLeft = orgChartPanStart.scrollLeft - (event.clientX - orgChartPanStart.x);
+    chart.scrollTop = orgChartPanStart.scrollTop - (event.clientY - orgChartPanStart.y);
+});
+window.addEventListener("mouseup", event => {
+    if(event.button !== 2 || !orgChartPanStart) return;
+    orgChartPanStart = null;
+    chart.classList.remove("panning");
+});
+}
+
+function fillOrgParentOptions(currentId = ""){
+const select = document.getElementById("orgEditorParent");
+const current = currentId ? orgMembers.find(member => member.id === currentId) : null;
+const candidates = orgMembers.filter(member => member.id !== currentId && !isOrgDescendant(currentId, member.id));
+select.innerHTML = '<option value="">Aucun supérieur direct</option>'+candidates.map(member => {
+    const selected = current && current.parentId === member.id ? "selected" : "";
+    return `<option value="${escapeHtml(member.id)}" ${selected}>${escapeHtml(member.grade)} - ${escapeHtml(member.name || "Sans nom")}</option>`;
+}).join("");
+}
+
+function openOrgEditor(id = ""){
+const member = id ? orgMembers.find(item => item.id === id) : null;
+document.getElementById("orgEditorTitle").textContent = member ? "Modifier un membre" : "Ajouter un membre";
+document.getElementById("orgEditorId").value = member ? member.id : "";
+document.getElementById("orgEditorName").value = member ? member.name : "";
+document.getElementById("orgEditorRace").value = member ? member.race : "Race";
+document.getElementById("orgEditorGrade").value = member ? member.grade : "Garde";
+document.getElementById("orgEditorSpecialty").value = member ? member.specialty : "";
+document.getElementById("orgEditorRole").value = member ? member.role : "";
+document.getElementById("orgEditorNote").value = member ? member.note : "";
+fillOrgParentOptions(member ? member.id : "");
+document.getElementById("orgEditorModal").classList.add("open");
+}
+
+function closeOrgEditor(event){
+if(event && event.target !== document.getElementById("orgEditorModal")) return;
+document.getElementById("orgEditorModal").classList.remove("open");
+}
+
+async function saveOrgMember(){
+const id = document.getElementById("orgEditorId").value || "org-"+Date.now();
+const member = normalizeOrgMember({
+    id,
+    parentId: document.getElementById("orgEditorParent").value,
+    name: document.getElementById("orgEditorName").value.trim(),
+    race: document.getElementById("orgEditorRace").value,
+    grade: document.getElementById("orgEditorGrade").value,
+    specialty: document.getElementById("orgEditorSpecialty").value.trim(),
+    role: document.getElementById("orgEditorRole").value.trim(),
+    note: document.getElementById("orgEditorNote").value.trim()
+});
+
+if(!member.name){
+    alert("Indique au moins un nom.");
+    return;
+}
+
+let savedMember = member;
+if(orgChartOnline && supabaseClient){
+    const synced = await syncOrgMember(member);
+    if(!synced) return;
+    savedMember = synced;
+}
+
+const existingIndex = orgMembers.findIndex(item => item.id === id);
+if(existingIndex >= 0){
+    orgMembers[existingIndex] = savedMember;
+} else {
+    orgMembers.push(savedMember);
+}
+
+saveOrgChart();
+renderOrgChart();
+closeOrgEditor();
+setOrgStatus(orgChartOnline ? "Membre enregistré et synchronisé." : "Membre enregistré en local.");
+}
+
+async function deleteOrgMember(id){
+const member = orgMembers.find(item => item.id === id);
+if(!member) return;
+if(!confirm("Êtes-vous sûr de vouloir supprimer ce membre de l'organigramme ?")) return;
+if(orgChartOnline && supabaseClient && !await deleteOrgMemberFromSupabase(member)) return;
+const children = getOrgChildren(id);
+children.forEach(child => child.parentId = member.parentId || "");
+orgMembers = orgMembers.filter(item => item.id !== id);
+saveOrgChart();
+renderOrgChart();
+setOrgStatus(orgChartOnline ? "Membre supprimé et synchronisé." : "Membre supprimé en local.");
+}
+
+async function resetOrgChartDemo(){
+if(!confirm("Réinitialiser l'organigramme avec les membres de test ?")) return;
+orgMembers = defaultOrgMembers.map(normalizeOrgMember);
+if(orgChartOnline && supabaseClient){
+    if(!await validateGuardPassword(false, "org")){
+        setOrgStatus("Mot de passe garde requis ou incorrect pour réinitialiser l'organigramme.");
+        return;
+    }
+    for(const member of orgMembers){
+        const synced = await syncOrgMember(member);
+        if(!synced) return;
+    }
+}
+saveOrgChart();
+renderOrgChart();
+setOrgStatus(orgChartOnline ? "Organigramme réinitialisé et synchronisé." : "Organigramme réinitialisé en local.");
 }
 
 function normalizeServiceMap(data = {}){
@@ -4434,6 +5323,7 @@ handleFormChange();
 }
 
 renderLaws();
+loadOrgChart();
 restorePersonalNotes();
 renderServiceMaps();
 initWatchBoardSync();
