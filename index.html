@@ -946,6 +946,52 @@ a.quiet-btn {
     color:#4f351e;
 }
 
+.discord-limit-panel {
+    display:none;
+    margin:10px 0 8px;
+    padding:10px;
+    background:rgba(255,252,239,0.40);
+    border:1px solid rgba(70,40,20,0.20);
+    color:rgba(54,35,20,0.78);
+    font-size:13px;
+}
+
+.discord-limit-panel.show {
+    display:block;
+}
+
+.discord-limit-head {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:8px;
+}
+
+.discord-limit-title {
+    font-weight:bold;
+    color:#3b2414;
+}
+
+.discord-limit-count {
+    font-size:12px;
+    font-style:italic;
+    color:rgba(54,35,20,0.68);
+    white-space:nowrap;
+}
+
+.discord-part-buttons {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));
+    gap:8px;
+}
+
+.discord-part-buttons button {
+    min-height:34px;
+    font-size:12px;
+    padding:8px 10px;
+}
+
 .indiv-card {
     position:relative;
     padding:8px 34px 8px 10px;
@@ -1019,6 +1065,10 @@ pre {
     font-family:Georgia, serif;
     min-height:220px;
     white-space:normal;
+    max-width:100%;
+    overflow:hidden;
+    overflow-wrap:anywhere;
+    word-break:break-word;
     box-shadow:inset 0 1px 0 rgba(255,255,255,0.06), 0 10px 22px rgba(38,24,13,0.16);
 }
 
@@ -1039,6 +1089,9 @@ pre {
 
 .preview-line {
     margin:4px 0;
+    max-width:100%;
+    overflow-wrap:anywhere;
+    word-break:break-word;
 }
 
 .preview-quote {
@@ -1046,6 +1099,9 @@ pre {
     padding:4px 0 4px 10px;
     border-left:4px solid #4f545c;
     color:#d4d7dc;
+    max-width:100%;
+    overflow-wrap:anywhere;
+    word-break:break-word;
 }
 
 .preview-small {
@@ -1053,6 +1109,9 @@ pre {
     color:#aeb2b8;
     font-size:12px;
     font-style:italic;
+    max-width:100%;
+    overflow-wrap:anywhere;
+    word-break:break-word;
 }
 
 .output-title {
@@ -1818,6 +1877,14 @@ Une fois terminé, utilisez <strong>Copier le titre</strong> puis collez-le dans
 <button onclick="copyGeneratedPart('title')">Copier le titre</button>
 <button onclick="copyGeneratedPart('content')">Copier le contenu</button>
 </div>
+<div class="discord-limit-panel" id="discordLimitPanel">
+<div class="discord-limit-head">
+<span class="discord-limit-title">Discord classique</span>
+<span class="discord-limit-count" id="discordLimitCount"></span>
+</div>
+<div id="discordLimitHint"></div>
+<div class="discord-part-buttons" id="discordPartButtons"></div>
+</div>
 <button class="quiet-btn" type="button" onclick="resetForm()">Nouveau rapport</button>
 <div id="copyStatus"></div>
 </div>
@@ -2138,6 +2205,7 @@ const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 let canSaveForm = false;
 let watchBoard = { wanted: [], banned: [] };
 let indivList = [];
+const discordClassicLimit = 1950;
 let supabaseClient = null;
 let watchBoardOnline = false;
 let serviceMapsOnline = false;
@@ -2372,7 +2440,7 @@ const localLaws = [
     { article:"Article XXXI", title:"Commerce étranger non recensé", text:"Les marchands étrangers ne sont pas autorisés à commercer sans recensement auprès de la Châtellerie." },
     { article:"Article XXXII", title:"Commerce étranger hors zone autorisée", text:"Les caravanes khajiites et marchands étrangers peuvent commercer sous surveillance des gardes à l'extérieur des murs de Vendeaume, par delà le pont." },
     { article:"Article XXXIII", title:"Fraude commerciale", text:"Toute fraude sur poids et mesures vaut confiscation des biens." },
-    { article:"Article XXXIV", title:"Taverne ouverte après l'appel de cloche", text:"Les tavernes ferment au troisième appel de cloche." },
+  { article:"Article XXXIV", title:"Casque, masque ou capuche dans Vendeaume", text:"Les casques, masques et capuches sont interdits au sein des murs de Vendeaume." },
     { article:"Article XXXV", title:"Bagarre dans les rues", text:"Les bagarres dans les rues entraînent amende ou cachot." },
     { article:"Article XXXVII", title:"Trahison draconique", text:"Aider volontairement un dragon ou un culte draconique est trahison." },
     { article:"Article XXXVIII", title:"Provocation de géants", text:"Les géants de la Châtellerie ne doivent pas être provoqués sans raison." },
@@ -4641,6 +4709,107 @@ preview.innerHTML = text.split("\n").map(line => {
 }).join("");
 }
 
+function splitDiscordClassicText(text, limit = discordClassicLimit){
+const normalized = String(text || "").trim();
+if(!normalized) return [];
+const parts = [];
+let current = "";
+
+function pushCurrent(){
+    if(current.trim()){
+        parts.push(current.trim());
+    }
+    current = "";
+}
+
+function appendText(value, separator){
+    const textValue = String(value || "");
+    if(!textValue) return;
+    const gap = current ? separator : "";
+
+    if((current + gap + textValue).length <= limit){
+        current += gap + textValue;
+        return;
+    }
+
+    pushCurrent();
+
+    if(textValue.length <= limit){
+        current = textValue;
+        return;
+    }
+
+    splitLongLine(textValue).forEach(chunk => appendText(chunk, ""));
+}
+
+function splitLongLine(line){
+    const chunks = [];
+    let rest = line;
+
+    while(rest.length > limit){
+        let cut = rest.lastIndexOf(" ", limit);
+        if(cut < Math.floor(limit * 0.65)){
+            cut = limit;
+        }
+        chunks.push(rest.slice(0, cut).trim());
+        rest = rest.slice(cut).trim();
+    }
+
+    if(rest){
+        chunks.push(rest);
+    }
+
+    return chunks;
+}
+
+function appendBlock(block){
+    if(!block) return;
+    const separator = current ? "\n\n" : "";
+
+    if((current + separator + block).length <= limit){
+        current += separator + block;
+        return;
+    }
+
+    if(block.length <= limit){
+        pushCurrent();
+        current = block;
+        return;
+    }
+
+    block.split("\n").forEach(line => appendText(line, "\n"));
+}
+
+normalized.split(/\n{2,}/).forEach(block => appendBlock(block.trim()));
+pushCurrent();
+return parts;
+}
+
+function renderDiscordClassicControls(contentText){
+const panel = document.getElementById("discordLimitPanel");
+const count = document.getElementById("discordLimitCount");
+const hint = document.getElementById("discordLimitHint");
+const buttons = document.getElementById("discordPartButtons");
+
+if(!panel || !count || !hint || !buttons) return;
+
+const length = String(contentText || "").length;
+const parts = splitDiscordClassicText(contentText);
+count.textContent = length+" / 2000 caractères";
+buttons.innerHTML = "";
+
+if(length <= 2000){
+    panel.classList.remove("show");
+    return;
+}
+
+panel.classList.add("show");
+hint.textContent = "Le contenu dépasse la limite Discord classique. Copiez les morceaux dans l'ordre, en messages séparés. Avec Nitro, la copie complète passe jusqu'à 4000 caractères.";
+buttons.innerHTML = parts.map((part, index) =>
+    "<button type=\"button\" onclick=\"copyGeneratedChunk("+index+")\">Copier contenu "+(index + 1)+"/"+parts.length+" ("+part.length+")</button>"
+).join("");
+}
+
 function getZoneMapCanvasPoint(event){
 const canvas = document.getElementById("zoneMapCanvas");
 const rect = canvas.getBoundingClientRect();
@@ -5244,6 +5413,7 @@ const fullText = titleText+"\n\n"+contentText;
 document.getElementById("outputTitle").textContent = titleText;
 document.getElementById("output").textContent = contentText;
 renderDiscordPreview(fullText);
+renderDiscordClassicControls(contentText);
 if(!options.silent){
     document.getElementById("copyStatus").textContent = "";
 }
@@ -5285,6 +5455,21 @@ try {
     document.getElementById("copyStatus").textContent = label+" copié dans le presse-papiers.";
 } catch(e) {
     document.getElementById("copyStatus").textContent = "Copie bloquée par le navigateur. Sélectionne le texte copiable puis Ctrl+C.";
+}
+}
+
+async function copyGeneratedChunk(index){
+const generated = generate({ silent:true });
+const parts = splitDiscordClassicText(generated.content);
+const text = parts[index] || "";
+
+try {
+    if(!text.trim() || !await copyTextToClipboard(text)){
+        throw new Error("copy failed");
+    }
+    document.getElementById("copyStatus").textContent = "Contenu "+(index + 1)+"/"+parts.length+" copié.";
+} catch(e) {
+    document.getElementById("copyStatus").textContent = "Copie bloquée par le navigateur. Sélectionne le morceau puis Ctrl+C.";
 }
 }
 
